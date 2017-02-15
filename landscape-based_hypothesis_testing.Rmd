@@ -30,7 +30,23 @@ install.packages("FedData")
 
 ## Reading "site" locations from a table
 ```{r}
-readr::read_csv("")
+# Load cell tower location data straight from the internet using a URL path
+cell_towers <- readr::read_csv("https://raw.githubusercontent.com/bocinsky/r_tutorials/master/data/cell_towers.csv")
+
+# Create a SpatialPointsDataFrame by adding coordinates
+coordinates(cell_towers) <- ~Longitude+Latitude
+# And set the projection information
+proj4string(cell_towers) <- "+proj=longlat"
+
+# Create a quick plot of the locations
+pal <- colorNumeric("YlOrRd", cell_towers$`Overall Height of Structure`, n = 8)
+leaflet(cell_towers) %>% 
+  addTiles() %>%
+  addCircleMarkers(color = ~pal(`Overall Height of Structure`)) %>%
+  addLegend("bottomleft", pal = pal, values = ~`Overall Height of Structure`,
+    title = "Height of Tower (m)",
+    opacity = 1
+  )
 ```
 
 ## Cropping to a study area
