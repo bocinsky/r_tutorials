@@ -1,0 +1,48 @@
+---
+title: "Landscape-based Hypothesis Testing"
+author: "Kyle Bocinsky"
+date: "2/15/2017"
+output:
+  html_notebook: default
+  html_document:
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(sp)
+library(raster)
+library(leaflet)
+
+
+```
+
+## Introduction
+
+
+## Learning goals
+
+## Installing and loading the `FedData` package
+```{r}
+install.packages("FedData")
+```
+
+## Reading "site" locations from a table
+```{r}
+readr::read_csv("")
+```
+
+## Cropping to a study area
+
+
+## Visualizing site locations
+
+## Downloading landscape data with `FedData`
+
+## Are sites situated based on soil type?
+
+## Are sites situated based on elevation?
+
+## Conclusions
+
