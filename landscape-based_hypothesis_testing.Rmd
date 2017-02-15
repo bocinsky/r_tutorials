@@ -35,14 +35,14 @@ install.packages("FedData")
 cell_towers <- readr::read_csv("https://raw.githubusercontent.com/bocinsky/r_tutorials/master/data/cell_towers.csv")
 
 # Create a SpatialPointsDataFrame by adding coordinates
-coordinates(cell_towers) <- ~longitude+latitude
+coordinates(cell_towers) <- ~Longitude+Latitude
 # And set the projection information
 proj4string(cell_towers) <- "+proj=longlat"
 
 # Create a quick plot of the locations
 leaflet(cell_towers) %>% 
   addTiles() %>%
-  addMarkers(popup = ~htmlEscape(cid))
+  addMarkers(popup = ~htmlEscape(Entity Name))
 ```
 
 ## Cropping to a study area
