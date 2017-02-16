@@ -136,7 +136,7 @@ Now we see that there are `r length(cell_towers)` cell towers in our study area.
 
 ## Visualizing site locations
 
-There are *many* different ways to visualize spatial data in *R*, but perhaps the most useful is using the *leaflet* package, which allows you to make interactive HTML maps that will impress your friends and confuse your advisor. I'm not going to go through all of the syntax here, but in general *leaflet* 
+There are *many* different ways to visualize spatial data in *R*, but perhaps the most useful is using the *leaflet* package, which allows you to make interactive HTML maps that will impress your friends, are intuitive to your 4-year-old niece, and will thoroughly confuse your advisor. I'm not going to go through all of the syntax here, but in general *leaflet* allows you to layer spatial objects over open-source map tiles to create pretty, interactive maps. Here, we'll initialize a map, add several external base layer tiles, and then overlay our county extent and cell tower objects. *leaflet* is provided by the good folks at RStudio, and is well documented [here](https://rstudio.github.io/leaflet/). Zoom in on the satellite view, and you can see the cell towers!
 
 ```{r}
 # Create a quick plot of the locations
@@ -184,7 +184,7 @@ In this analysis, we'll be downloading the 1 arc-second elevation data from the 
 Here, we'll download the 1 arc-second NED with the `get_ned()` function from *FedData*, using the `my_county` *SpatialPolygonsDataFrame* object that we created above as out `template`, and local relative paths for our `raw.dir` and `extraction.dir`. We'll download and prepare the NED, and then plot it using the basic `plot()` function.
   
 ```{r}
-
+# Download the 1 arc-second NED elevation model for our study area
 my_county_NED <- FedData::get_ned(template = my_county,
                                 label = "my_county",
                                 raw.dir = "./OUTPUT/RAW/NED/",
@@ -200,7 +200,7 @@ my_county_NED
 my_county_NED %>%
   plot()
 
-# Plot the Whitman county polygon over the elevation raster
+# Plot the my_county polygon over the elevation raster
 my_county %>%
   plot(add = T)
 
