@@ -26,12 +26,13 @@ library(dplyr)
 library(broom)
 library(foreach)
 library(FedData)
+
 ```
 
 ## Introduction
 Many region-scale analyses in archaeology begin with a simple question: How do site locations relate to landscape attributes, such as elevation, soil type, or distance to water or other resources. Such a question is the foundation of basic geospatial exploratory data analysis, and answering it for a set of landscape attributes is the first step towards doing more interesting things, from interpreting settlement patterns in the past [@Kowalewski2008], to the construction of sophisticated predictive models of site location [@Graves2012;@Kohler1986;@Maschner1995], to guiding settlement decision frameworks in agent-based simulations [e.g., @Axtell2002;@Griffin2007;@Kohler2012]. **In this tutorial, we will learn how to use *R* to load, view, and explore site location data, and perform a very basic statistical settlement pattern analysis relating site location to elevation.**
 
-Of course, archaeological site locations are often sensitive information, and it wouldn't be prudent to provide them in tutorial like this. So instead of using actual site locations, we'll use a point dataset for which we can make a resonable hypothesis concerning landscape attributes: [cell tower locations from the US Federal Communications Commission](http://wireless.fcc.gov/uls/index.htm?job=transaction&page=weekly). The cell tower data are somewhat difficult to work with, so I've distilled a snapshot of the database (acccessed on February 14, 2017), and posted it online for easy download. We'll go through the process of downloading them later in this tutorial. The hypothesis we'll be testing is that cell towers are positioned in unusually high places on the landscape. This is similar to hypotheses we might make about archaeological site locations, perhaps having to do with defensibility [e.g., @Bocinsky2014;@Martindale2009;@Sakaguchi2010] or intervisibility and signaling [e.g., @Johnson2003;@VanDyke2016].
+Of course, archaeological site locations are often sensitive information, and it wouldn't be prudent to provide them in tutorial like this. So instead of using actual site locations, we'll use a point dataset for which we can make a reasonable hypothesis concerning landscape attributes: [cell tower locations from the US Federal Communications Commission](http://wireless.fcc.gov/uls/index.htm?job=transaction&page=weekly). The cell tower data are somewhat difficult to work with, so I've distilled a snapshot of the database (accessed on February 14, 2017), and posted it online for easy download. We'll go through the process of downloading them later in this tutorial. The hypothesis we'll be testing is that cell towers are positioned in unusually high places on the landscape. This is similar to hypotheses we might make about archaeological site locations, perhaps having to do with defensibility [e.g., @Bocinsky2014;@Martindale2009;@Sakaguchi2010] or intervisibility and signaling [e.g., @Johnson2003;@VanDyke2016].
 
 This tutorial is an *R Markdown* HTML document, meaning that all of the code to perform the calculations presented here **was run when this web page was built**---the paper was *compiled*. "Executable papers" such as this one are fantastic for presenting reproducible research in such a way that **data, analysis, and interpretation** are each given equal importance. Feel free to use this analysis as a template for your own work. All data and code for performing this analysis are available on Github at [https://github.com/bocinsky/r_tutorials](https://github.com/bocinsky/r_tutorials).
 
@@ -45,8 +46,8 @@ In this short tutorial, you will learn how to:
   - Generate interactive web-maps using the `leaflet` package
   - Download federated datasets (including elevation data) using the `FedData` package
   - Extract data from a raster for specific points
-  - Calculate and graph Monte Carlo subsampled kernel density estimates for random locations
-  - Calculate Monte Carlo subsampled Mann-Whitney U test statistics (a non-parametric equivalent to the Student's t-test)
+  - Calculate and graph Monte Carlo sub-sampled kernel density estimates for random locations
+  - Calculate Monte Carlo sub-sampled Mann-Whitney U test statistics (a non-parametric equivalent to the Student's t-test)
 
 ## Defining the study area
 All landscape-scale analyses start with the definition of a study area. Since the cell tower dataset with which we'll be working covers the whole USA, we could really set our study area to be anywhere. Here, we will download an ESRI shapefile of counties in the United States available from the US Census, and pick a county to serve as our study area. I'm going to pick Whitman county, Washington, because that's where I live; feel free to choose your own county!
@@ -164,6 +165,8 @@ leaflet(width = "100%") %>% # This line initializes the leaflet map, and sets th
     position = "topleft")
 ```
 
+It's obvious from this map that the cell towers aren't merely situated to be in high places---they also tend to cluster along roads and in densely populated areas.
+
 ## Downloading landscape data with *FedData*
 *FedData* is an *R* package that is designed to take much of the pain out of downloading and preparing data from federated geospatial databases. For an area of interest (AOI) that you specify, each function in *FedData* will **download** the requisite raw data, **crop** the data to your AOI, and **mosaic** the data, including merging any tabular data. Currently, *FedData* has functions to download and prepare these datasets:
 
@@ -174,7 +177,7 @@ leaflet(width = "100%") %>% # This line initializes the leaflet map, and sets th
   * The [**Daymet**](https://daymet.ornl.gov/) gridded estimates of daily weather parameters for North America, version 3, available from the Oak Ridge National Laboratory's Distributed Active Archive Center (DAAC), and
   * The [**International Tree Ring Data Bank (ITRDB)**](http://www.ncdc.noaa.gov/data-access/paleoclimatology-data/datasets/tree-ring), coordinated by NOAA.
   
-In this analysis, we'll be downloading the 1 arc-second elevation data from the NED underour study area. The *FedData* functions each require four basic parameters:
+In this analysis, we'll be downloading the 1 arc-second elevation data from the NED under our study area. The *FedData* functions each require four basic parameters:
 
   * A `template` defining your AOI, either supplied as a spatial object ([`spatial*`](https://www.rdocumentation.org/packages/sp/topics/sp) or [`raster*`](https://www.rdocumentation.org/packages/raster/topics/raster) or a spatial [`extent`](https://www.rdocumentation.org/packages/raster/topics/extent) object
   * A character string (`label`) identifying your AOI, used for file names
@@ -190,9 +193,6 @@ my_county_NED <- FedData::get_ned(template = my_county,
                                 raw.dir = "./OUTPUT/RAW/NED/",
                                 extraction.dir = "./OUTPUT/EXTRACTIONS/NED/")
 
-# Print the class of the my_county_NED object
-class(my_county_NED)
-
 # Print the my_county_NED object
 my_county_NED
 
@@ -206,15 +206,23 @@ my_county %>%
 
 ```
 
-As you can see, the NED elevation data was downloaded for our study area, and **cropped** to the rectangular extent of the county.
+The NED elevation data was downloaded for our study area, and **cropped** to the rectangular extent of the county.
 
 ## Are sites situated based on elevation?
 
+
+### Extract site elevations
 ```{r}
 
 # Extract cell tower elevations from the study area NED values
 cell_towers$`Elevation (m)` <- my_county_NED %>%
   raster::extract(cell_towers)
+
+cell_towers@data
+```
+
+### Plot kernel density curves for sites and landscape
+```{r}
 
 cell_towers_densities <- cell_towers$`Elevation (m)` %>%
   density(from = 150,
@@ -269,50 +277,42 @@ ggplotly(g)
 
 ```
 
+
+### Mann-Whitney U test comparing non-normal distributions
 ```{r}
 
 # Draw 999 random samples from the NED, and compute two-sample Wilcoxon tests (Mann-Whitney U tests)
 my_county_Cell_MWU <- foreach(n = 1:999, .combine = rbind) %do% {
   my_county_sample <- my_county_NED_values %>%
     sample(length(cell_towers),
-           replace = FALSE)
-
-    MWU <- wilcox.test(x = cell_towers$`Elevation (m)`,
-                y = my_county_sample,
+           replace = FALSE) %>%
+    wilcox.test(x = cell_towers$`Elevation (m)`,
+                y = .,
                 alternative = "greater",
                 exact = FALSE) %>%
     tidy() %>%
     tibble::as_tibble()
-    
-    CLES <- outer(X = cell_towers$`Elevation (m)`,
-                  Y = my_county_sample,
-                  FUN = "-")
-
-    CLES <- ifelse(CLES == 0, 0.5, CLES > 0) %>%
-      mean() %>%
-      tibble::tibble(CLES = .)
-    
-    return(MWU %>%
-             bind_cols(CLES))
   
 } %>%
-  dplyr::select(statistic, p.value, CLES)
+  dplyr::select(statistic, p.value)
 
 my_county_Cell_MWU <- foreach::foreach(prob = c(0.025,0.5,0.975), .combine = rbind) %do% {
   my_county_Cell_MWU %>%
       dplyr::summarise_all(quantile, probs = prob)
 } %>%
   t() %>%
-  round(digits = 2) %>%
   magrittr::set_colnames(c("Lower CI","Median","Upper CI")) %>%
-  magrittr::set_rownames(c("U statistic","p-value","CLES"))
+  magrittr::set_rownames(c("U statistic","p-value"))
 
-my_county_Cell_MWU
+my_county_Cell_MWU %T>%
+  write.csv("./OUTPUT/Mann_Whitney_results.csv") # Write output table as a CSV
 
 ```
 
-The results of the bootstrapped Mann-Whitney U two-sample tests demonstrate that it is highly likely that the cell towers in Whitman county were placed on unusually high places on the landscape (median U statistic = `r my_county_Cell_MWU["U statistic","Median"]`, median p-value = `r my_county_Cell_MWU["p-value","Median"]`), and the median common language effect size of `r my_county_Cell_MWU["CLES","Median"]` suggests that `r my_county_Cell_MWU["CLES","Median"]*100 %>% round()` percent of randomly drawn cell towers will be at a higher elevation than another randomly drawn location in the county.
+The results of the bootstrapped Mann-Whitney U two-sample tests demonstrate that it is highly likely that the cell towers in Whitman county were placed on unusually high places on the landscape (median U statistic = `r my_county_Cell_MWU["U statistic","Median"]`, median p-value = `r my_county_Cell_MWU["p-value","Median"]`).
 
 ## Conclusions
+*R* is extremely powerful as a geo-analytic tool, and encountering sophisticated code for the first time can be daunting. But it can also be useful for exploratory analysis, interactive data presentation, and 
+
 
 ## References cited
