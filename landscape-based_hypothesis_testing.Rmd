@@ -1,35 +1,105 @@
 ---
-title: "Landscape-based Hypothesis Testing"
+title: "Landscape-based Hypothesis Testing in *R*"
 author: "Kyle Bocinsky"
 date: "2/15/2017"
 output:
   html_notebook: default
   html_document:
     code_folding: show
+csl: journal-of-archaeological-science-reports.csl
+bibliography: ~/IMPORTANT/WSU/RESEARCH/Master.bib
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 library(sp)
+library(rgdal)
 library(raster)
 library(leaflet)
 library(htmltools)
-
-
+library(magrittr)
+library(ggplot2)
+library(plotly)
+library(tibble)
+library(dplyr)
+library(broom)
+library(foreach)
+library(FedData)
 ```
 
 ## Introduction
+Many region-scale analyses in archaeology begin with a simple question: How do site locations relate to landscape attributes, such as elevation, soil type, or distance to water or other resources. Such a question is the foundation of basic geospatial exploratory data analysis, and answering it for a set of landscape attributes is the first step towards doing more interesting things, from interpreting settlement patterns in the past [@Kowalewski2008], to the construction of sophisticated predictive models of site location [@Graves2012;@Kohler1986;@Maschner1995], to guiding settlement decision frameworks in agent-based simulations [e.g., @Axtell2002;@Griffin2007;@Kohler2012]. **In this tutorial, we will learn how to use *R* to load, view, and explore site location data, and perform a very basic statistical settlement pattern analysis relating site location to elevation.**
 
+Of course, archaeological site locations are often sensitive information, and it wouldn't be prudent to provide them in tutorial like this. So instead of using actual site locations, we'll use a point dataset for which we can make a resonable hypothesis concerning landscape attributes: [radio tower locations from the US Federal Communications Commission](http://wireless.fcc.gov/uls/index.htm?job=transaction&page=weekly). The radio tower data are somewhat difficult to work with, so I've distilled a snapshot of the database (acccessed on February 14, 2017), and posted it online for easy download. We'll go through the process of downloading them later in this tutorial. The hypothesis we'll be testing is that radio towers are positioned in unusually high places on the landscape. This is similar to hypotheses we might make about archaeological site locations, perhaps having to do with defensibility [e.g., @Bocinsky2014;@Martindale2009;@Sakaguchi2010] or intervisibility and signaling [e.g., @Johnson2003;@VanDyke2016].
+
+This tutorial is an *R Markdown* HTML document, meaning that all of the code to perform the calculations presented here **was run when this web page was built**---the paper was *compiled*. "Executable papers" such as this one are fantastic for presenting reproducible research in such a way that **data, analysis, and interpretation** are each given equal importance. Feel free to use this analysis as a template for your own work. All data and code for performing this analysis are available on Github at [https://github.com/bocinsky/r_tutorials](https://github.com/bocinsky/r_tutorials).
 
 ## Learning goals
+In this short tutorial, you will learn how to:
+  
+  - Download files from the internet in *R*
+  - Read ESRI shapefiles and other spatial objects into *R* using the `sp` and `rgdal` packages
+  - Promote tabular data into spatial objects
+  - Crop spatial objects by overlaying them atop one another
+  - Generate interactive web-maps using the `leaflet` package
+  - Download federated datasets (including elevation data) using the `FedData` package
+  - Extract data from a raster for specific points
+  - Calculate and graph Monte Carlo subsampled kernel density estimates for random locations
+  - Calculate Monte Carlo subsampled Mann-Whitney U test statistics (a non-parametric equivalent to the Student's t-test)
 
-## Installing and loading the `FedData` package
+## Defining the study area
+All landscape-scale analyses start with the definition of a study area. Since the radio tower dataset with which we'll be working covers the whole USA, we could really set our study area to be anywhere. Here, we will download an ESRI shapefile of counties in the United States available from the US Census, and pick a county to serve as our study area. I'm going to pick Whitman county, Washington, because that's where I live; feel free to choose your own county!
+
+Files may be downloaded in *R* using many different functions, but perhaps the most straightforward is the `download.file()` function, which requires that you specify a `url` to the file you wish to download, and a `destfile` where the downloaded file should end up. As the counties shapefile is in a zip archive, we will also use the `unzip()` function, which requires you define an extraction directory (`exdir`).
+
 ```{r}
-install.packages("FedData")
+# Download the 1:500000 scale counties shapefile from the US Census
+download.file("http://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_500k.zip",
+              destfile = "./data/cb_2015_us_county_500k.zip")
+
+# Unzip the file
+unzip("./data/cb_2015_us_county_500k.zip",
+      exdir = "./data/counties")
+
 ```
 
-## Reading "site" locations from a table
+Navigate to the `exdir` you specified and check to make sure the shapefile is there.
+
+Now it's time to load the shapefile into *R*. We'll be using the `readOGR()` function from the *rgdal* library, which reads a shapefile (and many other file formats) and stores it in memory as a `Spatial*` object of the *sp* library. The `readOGR()` function requires two parameters: a `dsn` (data source name) which is the directory where the shapefile is stored, and a `layer` which is the shapefile name (without the file extension). Other spatial file formats have different requirements for `dsn` and `layer`, so read the documentation (`help(readOGR)`) for more information.
+
+```{r}
+# Load the shapefile
+census_counties <- rgdal::readOGR(dsn = "./data/counties/",
+                          layer = "cb_2015_us_county_500k")
+
+# Inspect the spatial object
+census_counties
+
+```
+
+When we inspect the `census_counties` object, we see that it is a `r class(census_counties)` object with `r length(census_counties)` features. `r class(census_counties)` objects have an associated data table, in which we can see many fields including one called "NAME".
+
+Now it's time to extract just the county we want to define our study area. Because a `r class(census_counties)` object *extends* the `data.frame` class, we can perform selection just as we would with a `data.frame`. We do that here:
+
+```{r}
+# Select Whitman county
+Whitman <- Whitman[Whitman$NAME == "Whitman",]
+```
+
+```{r}
+
+# Transform to geographic coordinates
+Whitman %<>%
+  sp::spTransform("+proj=longlat")
+
+# Get a polygon of the rectangular extent of Whitman county. This is our study area.
+Whitman_extent <- Whitman %>%
+  FedData::polygon_from_extent()
+
+```
+
+## ## Reading "site" locations from a table and cropping to a study area
 ```{r}
 # Load cell tower location data straight from the internet using a URL path
 cell_towers <- readr::read_csv("https://raw.githubusercontent.com/bocinsky/r_tutorials/master/data/cell_towers.csv")
@@ -39,22 +109,189 @@ coordinates(cell_towers) <- ~Longitude+Latitude
 # And set the projection information
 proj4string(cell_towers) <- "+proj=longlat"
 
-# Create a quick plot of the locations
-leaflet(cell_towers) %>% 
-  addTiles() %>%
-  addMarkers(popup = ~htmlEscape(Entity Name))
+# Select cell towers in Whitman county extent
+cell_towers <- cell_towers[!is.na(over(cell_towers,Whitman_extent)),]
 ```
 
-## Cropping to a study area
-
-
 ## Visualizing site locations
+```{r}
+# Create a quick plot of the locations
+leaflet(width = "100%") %>% # This line initializes the leaflet map, and sets the width of the map at 100% of the window
+  addProviderTiles("OpenTopoMap", group = "Topo") %>% # This line adds the topographic map from Garmin
+  addProviderTiles("OpenStreetMap.BlackAndWhite", group = "OpenStreetMap") %>% # This line adds the OpenStreetMap tiles
+  addProviderTiles("Esri.WorldImagery", group = "Satellite") %>% # This line adds orthoimagery from ESRI
+  addProviderTiles("Stamen.TonerLines", # This line and the next adds roads and labels to the orthoimagery layer
+                   group = "Satellite"
+  ) %>%
+  addProviderTiles("Stamen.TonerLabels",
+                   group = "Satellite"
+  ) %>%
+  addPolygons(data = Whitman_extent, # This line adds the Whitman county extent polygon
+              label = "Whitman County",
+              fill = FALSE,
+              color = "black") %>%
+  addPolygons(data = Whitman, # This line adds the Whitman county polygon
+              label = "Whitman County",
+              fill = FALSE,
+              color = "red") %>%
+  addMarkers(data = cell_towers,
+             popup = ~htmlEscape(`Entity Name`)) %>% # This line adds cell tower locations
+  addLayersControl( # This line adds a controller for the background layers
+    baseGroups = c("Topo", "OpenStreetMap", "Satellite"),
+    options = layersControlOptions(collapsed = FALSE),
+    position = "topleft"
+  )
+```
 
 ## Downloading landscape data with `FedData`
+`FedData` is an *R* package that is designed to take much of the pain out of downloading and preparing data from federated geospatial databases. For an area of interest (AOI) that you specify, each function in `FedData` will **download** the requisite raw data, **crop** the data to your AOI, and **mosaic** the data, including merging any tabular data. Currently, `FedData` has functions to download and prepare these datasets:
 
-## Are sites situated based on soil type?
+  * The [**National Elevation Dataset (NED)**](http://ned.usgs.gov) digital elevation models (1 and 1/3 arc-second; USGS)
+  * The [**National Hydrography Dataset (NHD)**](http://nhd.usgs.gov) (USGS)
+  * The [**Soil Survey Geographic (SSURGO) database**](http://websoilsurvey.sc.egov.usda.gov/) from the National Cooperative Soil Survey (NCSS), which is led by the Natural Resources Conservation Service (NRCS) under the USDA,
+  * The [**Global Historical Climatology Network (GHCN)**](http://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/global-historical-climatology-network-ghcn) daily weather data, coordinated by the National Oceanic and Atmospheric Administration (NOAA),
+  * The [**Daymet**](https://daymet.ornl.gov/) gridded estimates of daily weather parameters for North America, version 3, available from the Oak Ridge National Laboratory's Distributed Active Archive Center (DAAC), and
+  * The [**International Tree Ring Data Bank (ITRDB)**](http://www.ncdc.noaa.gov/data-access/paleoclimatology-data/datasets/tree-ring), coordinated by NOAA.
+  
+In this analysis, we'll be downloading the 1 arc-second elevation data from the NED under Whitman county, Washington. The `FedData` functions each require four basic parameters:
+
+  * A `template` defining your AOI, either supplied as a spatial object ([`spatial*`](https://www.rdocumentation.org/packages/sp/topics/sp) or [`raster*`](https://www.rdocumentation.org/packages/raster/topics/raster) or a spatial [`extent`](https://www.rdocumentation.org/packages/raster/topics/extent) object
+  * A character string (`label`) identifying your AOI, used for file names
+  * A character string (`raw.dir`) defining where you want the raw data to be stored; this will be created if necessary
+  * A character string (`extraction.dir`) defining where you want the extracted data for your AOI to be stored; this will also be created if necessary
+  
+Here, we'll download the 1 arc-second NED with the `get_ned()` function from `FedData`, using the `Whitman` *SpatialPolygonsDataFrame* object that we created above as out `template`, and local relative paths for our `raw.dir` and `extraction.dir`. We'll download and prepare the Whitman county NED, and then 
+  
+```{r}
+
+Whitman_NED <- FedData::get_ned(template = Whitman,
+                                label = "Whitman",
+                                raw.dir = "./OUTPUT/RAW/NED/",
+                                extraction.dir = "./OUTPUT/EXTRACTIONS/NED/")
+
+# Print the class of the Whitman_NED object
+class(Whitman_NED)
+
+# Print the Whitman_NED object
+Whitman_NED
+
+# Plot the Whitman_NED object
+Whitman_NED %>%
+  plot()
+
+# Plot the Whitman county polygon over the elevation raster
+Whitman %>%
+  plot(add = T)
+
+```
+
+As you can see, the NED elevation data was downloaded for the Whitman county area, and **cropped** to the rectangular extent of Whitman county.
 
 ## Are sites situated based on elevation?
 
+```{r}
+
+# Extract cell tower elevations from the Whitman NED values
+cell_towers$`Elevation (m)` <- Whitman_NED %>%
+  raster::extract(cell_towers)
+
+cell_towers_densities <- cell_towers$`Elevation (m)` %>%
+  density(from = 150,
+            to = 1250,
+            n = 1101) %>% 
+    tidy() %>%
+    tibble::as_tibble() %>%
+  dplyr::mutate(y = y * 1101) %>%
+  dplyr::rename(Elevation = x,
+                Frequency = y)
+  
+
+# Load the NED elevations into memory for fast bootstrapping
+Whitman_NED_values <- Whitman_NED %>%
+  values()
+
+# Draw 999 random samples, and calculate their densities
+Whitman_NED_densities <- foreach(n = 1:999, .combine = rbind) %do% {
+  Whitman_NED_values %>%
+    sample(length(cell_towers),
+           replace = FALSE) %>%
+    density(from = 150,
+            to = 1250,
+            n = 1101) %>% 
+    tidy() %>%
+    tibble::as_tibble() %>%
+  dplyr::mutate(y = y * 1101)
+} %>%
+  group_by(x) %>%
+  do({
+    quantile(.$y, probs = c(0.025, 0.5, 0.975)) %>%
+      t() %>%
+      tidy()
+  }) %>%
+  set_names(c("Elevation", "Lower CI", "Frequency", "Upper CI"))
+
+g <- ggplot() +
+  geom_line(data = Whitman_NED_densities,
+            mapping = aes(x = Elevation,
+                          y = Frequency)) +
+  geom_ribbon(data = Whitman_NED_densities,
+              mapping = aes(x = Elevation,
+                            ymin = `Lower CI`,
+                            ymax = `Upper CI`),
+              alpha = 0.3) +
+  geom_line(data = cell_towers_densities,
+               mapping = aes(x = Elevation,
+                             y = Frequency),
+               color = "red")
+
+ggplotly(g)
+
+```
+
+```{r}
+
+# Draw 999 random samples from the NED, and compute two-sample Wilcoxon tests (Mann-Whitney U tests)
+Whitman_Cell_MWU <- foreach(n = 1:999, .combine = rbind) %do% {
+  Whitman_sample <- Whitman_NED_values %>%
+    sample(length(cell_towers),
+           replace = FALSE)
+
+    MWU <- wilcox.test(x = cell_towers$`Elevation (m)`,
+                y = Whitman_sample,
+                alternative = "greater",
+                exact = FALSE) %>%
+    tidy() %>%
+    tibble::as_tibble()
+    
+    CLES <- outer(X = cell_towers$`Elevation (m)`,
+                  Y = Whitman_sample,
+                  FUN = "-")
+
+    CLES <- ifelse(CLES == 0, 0.5, CLES > 0) %>%
+      mean() %>%
+      tibble::tibble(CLES = .)
+    
+    return(MWU %>%
+             bind_cols(CLES))
+  
+} %>%
+  dplyr::select(statistic, p.value, CLES)
+
+Whitman_Cell_MWU <- foreach::foreach(prob = c(0.025,0.5,0.975), .combine = rbind) %do% {
+  Whitman_Cell_MWU %>%
+      dplyr::summarise_all(quantile, probs = prob)
+} %>%
+  t() %>%
+  round(digits = 2) %>%
+  magrittr::set_colnames(c("Lower CI","Median","Upper CI")) %>%
+  magrittr::set_rownames(c("U statistic","p-value","CLES"))
+
+Whitman_Cell_MWU
+
+```
+
+The results of the bootstrapped Mann-Whitney U two-sample tests demonstrate that it is highly likely that the radio towers in Whitman county were placed on unusually high places on the landscape (median U statistic = `r Whitman_Cell_MWU["U statistic","Median"]`, median p-value = `r Whitman_Cell_MWU["p-value","Median"]`), and the median common language effect size of `r Whitman_Cell_MWU["CLES","Median"]` suggests that `r Whitman_Cell_MWU["CLES","Median"]*100 %>% round()` percent of randomly drawn radio towers will be at a higher elevation than another randomly drawn location in the county.
+
 ## Conclusions
 
+## References cited
