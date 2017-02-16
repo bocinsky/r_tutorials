@@ -56,11 +56,11 @@ Files may be downloaded in *R* using many different functions, but perhaps the m
 ```{r}
 # Download the 1:500000 scale counties shapefile from the US Census
 download.file("http://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_500k.zip",
-              destfile = "./data/cb_2015_us_county_500k.zip")
+              destfile = "./OUTPUT/cb_2015_us_county_500k.zip")
 
 # Unzip the file
 unzip("./data/cb_2015_us_county_500k.zip",
-      exdir = "./data/counties")
+      exdir = "./OUTPUT/counties")
 
 ```
 
@@ -70,7 +70,7 @@ Now it's time to load the shapefile into *R*. We'll be using the `readOGR()` fun
 
 ```{r}
 # Load the shapefile
-census_counties <- rgdal::readOGR(dsn = "./data/counties/",
+census_counties <- rgdal::readOGR(dsn = "./OUTPUT/counties/",
                           layer = "cb_2015_us_county_500k")
 
 # Inspect the spatial object
@@ -84,22 +84,31 @@ Now it's time to extract just the county we want to define our study area. Becau
 
 ```{r}
 # Select Whitman county
-Whitman <- Whitman[Whitman$NAME == "Whitman",]
+my_county <- census_counties[census_counties$NAME == "Whitman",]
+
+# Inspect the spatial object
+my_county
 ```
+
+As you can see, the spatial object now has only one feature, and it is Whitman county! We'll map it in a minute, but first let's do two more things to make our lives easier down the road. We'll be mapping using the *leaflet* package, which makes pretty, interactive web maps. For *leaflet*, we need the spatial data to be in geographic coordinates (longitude/latitude) using the WGS84 ellipsoid. Here, we'll transform our county to that projection system using the `spTransform()` function, then get the rectangular extent of our county using a function called `polygon_from_extent()` available in the *FedData* package (more on that package later).
+
+This code chunk also uses something new: the **pipe** operator `%>%` from the [*magrittr*](https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) package. The pipe operator enables you to "pipe" a value forward into an expression or function call---whatever is on the left hand side of the pipe becomes the first argument to the function on the right hand side. So, for example, to find the mean of the numeric vector `c(1,2,3,5)` by typing `mean(c(1,2,3,5))`, we could instead use the pipe: `c(1,2,3,5) %>% mean()`. Try running both versions; you should get `r c(1,2,3,5) %>% mean()` for each. The pipe isn't much use for such a simple example, but becomes *really* helpful for code readability when chaining together many different functions. The compound assignment operator `%<>%` pipes an object forward into a function or call expression and then updates the left hand side object with the resulting value, and is equivalent to `x <- x %>% fun()`
 
 ```{r}
 
 # Transform to geographic coordinates
-Whitman %<>%
+my_county %<>%
   sp::spTransform("+proj=longlat")
 
 # Get a polygon of the rectangular extent of Whitman county. This is our study area.
-Whitman_extent <- Whitman %>%
+my_county_extent <- my_county %>%
   FedData::polygon_from_extent()
 
 ```
 
-## ## Reading "site" locations from a table and cropping to a study area
+## Reading "site" locations from a table and cropping to a study area
+Alright, now that we've got our study area defined, we can load our "site" data (the radio towers).
+
 ```{r}
 # Load cell tower location data straight from the internet using a URL path
 cell_towers <- readr::read_csv("https://raw.githubusercontent.com/bocinsky/r_tutorials/master/data/cell_towers.csv")
