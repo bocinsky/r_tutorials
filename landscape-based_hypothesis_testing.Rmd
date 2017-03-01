@@ -3,36 +3,36 @@ title: "Landscape-based Hypothesis Testing in *R*"
 author: "Kyle Bocinsky"
 date: "2/15/2017"
 output:
-  html_notebook: default
   html_document:
     code_folding: show
+  html_notebook: default
 csl: journal-of-archaeological-science-reports.csl
-bibliography: ~/IMPORTANT/WSU/RESEARCH/Master.bib
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-library(sp)
-library(rgdal)
-library(raster)
-library(leaflet)
-library(htmltools)
-library(magrittr)
-library(ggplot2)
-library(plotly)
-library(tibble)
-library(dplyr)
-library(broom)
-library(foreach)
-library(FedData)
+packages <- c("magrittr", # For piping
+              "foreach", "purrr", "tibble", "dplyr", "tidyr", "broom", # For tidy data analysis
+              "ggplot2","plotly", # For fancy graphs
+              "sp", "rgdal", "raster", # For spatial analysis
+              "leaflet", "htmltools", # For fancy maps
+              "FedData")
 
+# install.packages("devtools")
+devtools::install_cran(packages, repos = "https://cran.rstudio.com/") # For downloading federated geospatial data
+purrr::walk(packages, library, character.only = TRUE) # Load all packages with no output
+
+dir.create("OUTPUT",
+           showWarnings = FALSE,
+           recursive = FALSE)
 ```
 
 ## Introduction
 Many region-scale analyses in archaeology begin with a simple question: How do site locations relate to landscape attributes, such as elevation, soil type, or distance to water or other resources. Such a question is the foundation of basic geospatial exploratory data analysis, and answering it for a set of landscape attributes is the first step towards doing more interesting things, from interpreting settlement patterns in the past [@Kowalewski2008], to the construction of sophisticated predictive models of site location [@Graves2012;@Kohler1986;@Maschner1995], to guiding settlement decision frameworks in agent-based simulations [e.g., @Axtell2002;@Griffin2007;@Kohler2012]. **In this tutorial, we will learn how to use *R* to load, view, and explore site location data, and perform a very basic statistical settlement pattern analysis relating site location to elevation.**
 
-Of course, archaeological site locations are often sensitive information, and it wouldn't be prudent to provide them in tutorial like this. So instead of using actual site locations, we'll use a point dataset for which we can make a reasonable hypothesis concerning landscape attributes: [cell tower locations from the US Federal Communications Commission](http://wireless.fcc.gov/uls/index.htm?job=transaction&page=weekly). The cell tower data are somewhat difficult to work with, so I've distilled a snapshot of the database (accessed on February 14, 2017), and posted it online for easy download. We'll go through the process of downloading them later in this tutorial. The hypothesis we'll be testing is that cell towers are positioned in unusually high places on the landscape. This is similar to hypotheses we might make about archaeological site locations, perhaps having to do with defensibility [e.g., @Bocinsky2014;@Martindale2009;@Sakaguchi2010] or intervisibility and signaling [e.g., @Johnson2003;@VanDyke2016].
+Of course, archaeological site locations are often sensitive information, and it wouldn't be prudent to provide them in tutorial like this. So instead of using cultural site locations, we'll use a point dataset for which we can make a reasonable hypothesis concerning landscape attributes: [cell tower locations from the US Federal Communications Commission](http://wireless.fcc.gov/uls/index.htm?job=transaction&page=weekly). The cell tower data are somewhat difficult to work with, so I've distilled a snapshot of the database (accessed on February 14, 2017), and posted it online for easy download. We'll go through the process of downloading them later in this tutorial. The hypothesis we'll be testing is that cell towers are positioned in unusually high places on the landscape. This is similar to hypotheses we might make about archaeological site locations, perhaps having to do with defensibility [e.g., @Bocinsky2014;@Martindale2009;@Sakaguchi2010] or intervisibility and signaling [e.g., @Johnson2003;@VanDyke2016].
 
 This tutorial is an *R Markdown* HTML document, meaning that all of the code to perform the calculations presented here **was run when this web page was built**---the paper was *compiled*. "Executable papers" such as this one are fantastic for presenting reproducible research in such a way that **data, analysis, and interpretation** are each given equal importance. Feel free to use this analysis as a template for your own work. All data and code for performing this analysis are available on Github at [https://github.com/bocinsky/r_tutorials](https://github.com/bocinsky/r_tutorials).
 
@@ -57,11 +57,11 @@ Files may be downloaded in *R* using many different functions, but perhaps the m
 ```{r}
 # Download the 1:500000 scale counties shapefile from the US Census
 download.file("http://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_500k.zip",
-              destfile = "./OUTPUT/cb_2015_us_county_500k.zip")
+              destfile = "OUTPUT/cb_2015_us_county_500k.zip")
 
 # Unzip the file
-unzip("./OUTPUT/cb_2015_us_county_500k.zip",
-      exdir = "./OUTPUT/counties")
+unzip("OUTPUT/cb_2015_us_county_500k.zip",
+      exdir = "OUTPUT/counties")
 
 ```
 
@@ -71,7 +71,7 @@ Now it's time to load the shapefile into *R*. We'll be using the `readOGR()` fun
 
 ```{r}
 # Load the shapefile
-census_counties <- rgdal::readOGR(dsn = "./OUTPUT/counties/",
+census_counties <- rgdal::readOGR(dsn = "OUTPUT/counties",
                           layer = "cb_2015_us_county_500k")
 
 # Inspect the spatial object
@@ -190,8 +190,8 @@ Here, we'll download the 1 arc-second NED with the `get_ned()` function from *Fe
 # Download the 1 arc-second NED elevation model for our study area
 my_county_NED <- FedData::get_ned(template = my_county,
                                 label = "my_county",
-                                raw.dir = "./OUTPUT/RAW/NED/",
-                                extraction.dir = "./OUTPUT/EXTRACTIONS/NED/")
+                                raw.dir = "OUTPUT/RAW/NED",
+                                extraction.dir = "OUTPUT/EXTRACTIONS/NED")
 
 # Print the my_county_NED object
 my_county_NED
@@ -252,6 +252,7 @@ my_county_NED_densities <- foreach(n = 1:999, .combine = rbind) %do% {
   dplyr::mutate(y = y * 1101)
 } %>%
   group_by(x) %>%
+  # by_slice(~ quantile(.$y, probs = c(0.025, 0.5, 0.975)))
   do({
     quantile(.$y, probs = c(0.025, 0.5, 0.975)) %>%
       t() %>%
@@ -305,7 +306,7 @@ my_county_Cell_MWU <- foreach::foreach(prob = c(0.025,0.5,0.975), .combine = rbi
   magrittr::set_rownames(c("U statistic","p-value"))
 
 my_county_Cell_MWU %T>%
-  write.csv("./OUTPUT/Mann_Whitney_results.csv") # Write output table as a CSV
+  write.csv("OUTPUT/Mann_Whitney_results.csv") # Write output table as a CSV
 
 ```
 
