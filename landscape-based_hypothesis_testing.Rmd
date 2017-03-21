@@ -1,7 +1,7 @@
 ---
 title: "Landscape-based Hypothesis Testing in *R*"
 author: "Kyle Bocinsky"
-date: "2/15/2017"
+date: "3/20/2017"
 output:
   html_document:
     code_folding: show
@@ -9,25 +9,6 @@ output:
 csl: journal-of-archaeological-science-reports.csl
 bibliography: references.bib
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
-packages <- c("magrittr", # For piping
-              "foreach", "purrr", "tibble", "dplyr", "tidyr", "broom", # For tidy data analysis
-              "ggplot2","plotly", # For fancy graphs
-              "sp", "rgdal", "raster", # For spatial analysis
-              "leaflet", "htmltools", # For fancy maps
-              "FedData")
-
-# install.packages("devtools")
-devtools::install_cran(packages, repos = "https://cran.rstudio.com/") # For downloading federated geospatial data
-purrr::walk(packages, library, character.only = TRUE) # Load all packages with no output
-
-dir.create("OUTPUT",
-           showWarnings = FALSE,
-           recursive = FALSE)
-```
 
 ## Introduction
 Many region-scale analyses in archaeology begin with a simple question: How do site locations relate to landscape attributes, such as elevation, soil type, or distance to water or other resources. Such a question is the foundation of basic geospatial exploratory data analysis, and answering it for a set of landscape attributes is the first step towards doing more interesting things, from interpreting settlement patterns in the past [@Kowalewski2008], to the construction of sophisticated predictive models of site location [@Graves2012;@Kohler1986;@Maschner1995], to guiding settlement decision frameworks in agent-based simulations [e.g., @Axtell2002;@Griffin2007;@Kohler2012]. **In this tutorial, we will learn how to use *R* to load, view, and explore site location data, and perform a very basic statistical settlement pattern analysis relating site location to elevation.**
@@ -40,7 +21,7 @@ This tutorial is an *R Markdown* HTML document, meaning that all of the code to 
 In this short tutorial, you will learn how to:
   
   - Download files from the internet in *R*
-  - Read ESRI shapefiles and other spatial objects into *R* using the `sp` and `rgdal` packages
+  - Read ESRI shapefiles and other spatial objects into *R* using the `sf` and `raster` packages
   - Promote tabular data into spatial objects
   - Crop spatial objects by overlaying them atop one another
   - Generate interactive web-maps using the `leaflet` package
@@ -48,13 +29,40 @@ In this short tutorial, you will learn how to:
   - Extract data from a raster for specific points
   - Calculate and graph Monte Carlo sub-sampled kernel density estimates for random locations
   - Calculate Monte Carlo sub-sampled Mann-Whitney U test statistics (a non-parametric equivalent to the Student's t-test)
+  
+We will also gloss over several other fun topics in *R* data analysis, so [download the source](https://github.com/bocinsky/r_tutorials) to learn more!
+
+## Loading necessary packages
+Almost all *R* scripts require that you load packages that enable the functions you use in your script. We load our requisite packages here using the `install_cran()` function from the *devtools* library. `install_cran()` is nice because it will checck whether we have the most recent version of the packages, and only install the ones that are necessary. We also use the `walk()` function from the *purrr* package to quickly traverse a vector, but that's a topic for another tutorial.
+
+```{r setup, results='hide', message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+packages <- c("magrittr", # For piping
+              "foreach", "purrr", "tibble", "dplyr", "tidyr", "broom", # For tidy data analysis
+              "ggplot2","plotly", # For fancy graphs
+              "sf", "sp", "raster", # For spatial analysis
+              "leaflet", "htmltools", # For fancy maps
+              "FedData")
+
+# install.packages("devtools")
+devtools::install_cran(packages, repos = "https://cran.rstudio.com/") # For downloading federated geospatial data
+purrr::walk(packages,
+            library,
+            character.only = TRUE) # Load all packages with no output
+
+# Create an output folder in our current working directory
+dir.create("OUTPUT",
+           showWarnings = FALSE,
+           recursive = FALSE)
+```
 
 ## Defining the study area
-All landscape-scale analyses start with the definition of a study area. Since the cell tower dataset with which we'll be working covers the whole USA, we could really set our study area to be anywhere. Here, we will download an ESRI shapefile of counties in the United States available from the US Census, and pick a county to serve as our study area. I'm going to pick Whitman county, Washington, because that's where I live; feel free to choose your own county!
+All landscape-scale analyses start with the definition of a study area. Since the cell tower dataset with which we'll be working covers the whole USA, we could really set our study area to be anywhere in the US. Here, we will download an 1:500,500 scale ESRI shapefile of counties in the United States available from the US Census, and pick a county to serve as our study area. I'm going to pick Whitman county, Washington, because that's where I live; feel free to choose your own county!
 
 Files may be downloaded in *R* using many different functions, but perhaps the most straightforward is the `download.file()` function, which requires that you specify a `url` to the file you wish to download, and a `destfile` where the downloaded file should end up. As the counties shapefile is in a zip archive, we will also use the `unzip()` function, which requires you define an extraction directory (`exdir`).
 
-```{r}
+```{r message=FALSE, results='hide'}
 # Download the 1:500000 scale counties shapefile from the US Census
 download.file("http://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_500k.zip",
               destfile = "OUTPUT/cb_2015_us_county_500k.zip")
@@ -67,31 +75,30 @@ unzip("OUTPUT/cb_2015_us_county_500k.zip",
 
 Navigate to the `exdir` you specified and check to make sure the shapefile is there.
 
-Now it's time to load the shapefile into *R*. We'll be using the `readOGR()` function from the *rgdal* library, which reads a shapefile (and many other file formats) and stores it in memory as a `Spatial*` object of the *sp* library. The `readOGR()` function requires two parameters: a `dsn` (data source name) which is the directory where the shapefile is stored, and a `layer` which is the shapefile name (without the file extension). Other spatial file formats have different requirements for `dsn` and `layer`, so read the documentation (`help(readOGR)`) for more information.
+Now it's time to load the shapefile into *R*. We'll be using the `st_read()` function from the *sf* library, which reads a shapefile (and many other file formats) and stores it in memory as a "simple feature" object of the *sf* library. To read a shapefile, the `st_read()` function requires only the path to the shapefile with the ".shp" file extension. Other spatial file formats have different requirements for `st_read()`, so read the documentation (`help(st_read)`) for more information.
 
 ```{r}
 # Load the shapefile
-census_counties <- rgdal::readOGR(dsn = "OUTPUT/counties",
-                          layer = "cb_2015_us_county_500k")
+census_counties <- sf::st_read("OUTPUT/counties/cb_2015_us_county_500k.shp")
 
 # Inspect the spatial object
-census_counties
+head(census_counties)
 
 ```
 
-When we inspect the `census_counties` object, we see that it is a `r class(census_counties)` object with `r length(census_counties)` features. `r class(census_counties)` objects have an associated data table, in which we can see many fields including one called "NAME".
+When we inspect the `census_counties` object, we see that it is a simple feature collection with `r nrow(census_counties)` features. Simple feature collection objects are simply data frames with an extra column for spatial objects, and metadata including projection information.
 
-Now it's time to extract just the county we want to define our study area. Because a `r class(census_counties)` object *extends* the `data.frame` class, we can perform selection just as we would with a `data.frame`. We do that here:
+Now it's time to extract just the county we want to define our study area. Because a Simple feature collection object *extends* the `data.frame` class, we can perform selection just as we would with a `data.frame`. We do that here using the `filter()` function from the *dplyr* package:
 
 ```{r}
 # Select Whitman county
-my_county <- census_counties[census_counties$NAME == "Whitman",]
+my_county <- dplyr::filter(census_counties, NAME == "Whitman")
 
 # Inspect the spatial object
 my_county
 ```
 
-As you can see, the spatial object now has only one feature, and it is `r my_county@data$NAME` county! We'll map it in a minute, but first let's do two more things to make our lives easier down the road. We'll be mapping using the *leaflet* package, which makes pretty, interactive web maps. For *leaflet*, we need the spatial data to be in geographic coordinates (longitude/latitude) using the WGS84 ellipsoid. Here, we'll transform our county to that projection system using the `spTransform()` function, then get the rectangular extent of our county using a function called `polygon_from_extent()` available in the *FedData* package (more on that package later).
+As you can see, the spatial object now has only one feature, and it is `r my_county$NAME` county! We'll map it in a minute, but first let's do two more things to make our lives easier down the road. We'll be mapping using the *leaflet* package, which makes pretty, interactive web maps. For *leaflet*, we need the spatial data to be in geographic coordinates (longitude/latitude) using the WGS84 ellipsoid. Here, we'll transform our county to that projection system using the `st_transform()` function.
 
 This code chunk also uses something new: the **pipe** operator `%>%` from the [*magrittr*](https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) package. The pipe operator enables you to "pipe" a value forward into an expression or function call---whatever is on the left hand side of the pipe becomes the first argument to the function on the right hand side. So, for example, to find the mean of the numeric vector `c(1,2,3,5)` by typing `mean(c(1,2,3,5))`, we could instead use the pipe: `c(1,2,3,5) %>% mean()`. Try running both versions; you should get `r c(1,2,3,5) %>% mean()` for each. The pipe isn't much use for such a simple example, but becomes *really* helpful for code readability when chaining together many different functions. The compound assignment operator `%<>%` pipes an object forward into a function or call expression and then updates the left hand side object with the resulting value, and is equivalent to `x <- x %>% fun()`
 
@@ -99,47 +106,45 @@ This code chunk also uses something new: the **pipe** operator `%>%` from the [*
 
 # Transform to geographic coordinates
 my_county %<>%
-  sp::spTransform("+proj=longlat")
-
-# Get a polygon of the rectangular extent of Whitman county. This is our study area.
-my_county_extent <- my_county %>%
-  FedData::polygon_from_extent()
+  sf::st_transform("+proj=longlat +datum=WGS84")
 
 ```
 
 ## Reading "site" locations from a table and cropping to a study area
 Alright, now that we've got our study area defined, we can load our "site" data (the cell towers). We can use the `read_csv()` function from the *readr* library to read the cell tower locations straight from where I've archived them online. We'll read them in, and then print them.
 
-```{r}
+```{r message=FALSE}
 # Load cell tower location data straight from the internet using a URL path
 cell_towers <- readr::read_csv("https://raw.githubusercontent.com/bocinsky/r_tutorials/master/data/cell_towers.csv")
 
 cell_towers
 ```
 
-As you can see, the cell tower data includes basic identification information as well as geographic coordinates in longitude and latitude. We can use the coordinate data to *promote* the data frame to a spatial object using the `coordinates()` and `proj4string()` functions. Finally, we can use the `crop()` function from the *raster* package to select only the cell towers in our study area.
+As you can see, the cell tower data includes basic identification information as well as geographic coordinates in longitude and latitude. We can use the coordinate data to *promote* the data frame to a spatial object using the `st_as_sf()` function. Finally, we can write a simple function to select only the cell towers in our study area using the `filter()` function again, along with the `st_within()` function from the *sf* package.
 
-```{r}
-# Create a SpatialPointsDataFrame by adding coordinates
-coordinates(cell_towers) <- ~Longitude+Latitude
-
-# And set the projection information
-proj4string(cell_towers) <- "+proj=longlat"
+```{r message=FALSE, warning=FALSE}
+# Promote to a simple feature collection
+cell_towers %<>%
+  sf::st_as_sf(coords = c("Longitude","Latitude"),
+               crs = "+proj=longlat +datum=WGS84")
 
 # Select cell towers in our study area
 cell_towers %<>%
-  crop(my_county_extent)
+  dplyr::filter({
+    sf::st_within(., my_county, sparse = F) %>% # This function returns a matrix
+                  as.vector() # coerce to a vector
+    })
 
 cell_towers
 ```
 
-Now we see that there are `r length(cell_towers)` cell towers in our study area.
+Now we see that there are `r nrow(cell_towers)` cell towers in our study area.
 
 ## Visualizing site locations
 
-There are *many* different ways to visualize spatial data in *R*, but perhaps the most useful is using the *leaflet* package, which allows you to make interactive HTML maps that will impress your friends, are intuitive to your 4-year-old niece, and will thoroughly confuse your advisor. I'm not going to go through all of the syntax here, but in general *leaflet* allows you to layer spatial objects over open-source map tiles to create pretty, interactive maps. Here, we'll initialize a map, add several external base layer tiles, and then overlay our county extent and cell tower objects. *leaflet* is provided by the good folks at RStudio, and is well documented [here](https://rstudio.github.io/leaflet/). Zoom in on the satellite view, and you can see the cell towers!
+There are *many* different ways to visualize spatial data in *R*, but perhaps the most useful is using the *leaflet* package, which allows you to make interactive HTML maps that will impress your friends, are intuitive to a 4-year-old, and will thoroughly confuse your advisor. I'm not going to go through all of the syntax here, but in general *leaflet* allows you to layer spatial objects over open-source map tiles to create pretty, interactive maps. Here, we'll initialize a map, add several external base layer tiles, and then overlay our county extent and cell tower objects. *leaflet* is provided by the good folks at [RStudio](https://www.rstudio.com/), and is well documented [here](https://rstudio.github.io/leaflet/). Zoom in on the satellite view, and you can see the cell towers!
 
-```{r}
+```{r message=FALSE}
 # Create a quick plot of the locations
 leaflet(width = "100%") %>% # This line initializes the leaflet map, and sets the width of the map at 100% of the window
   addProviderTiles("OpenTopoMap", group = "Topo") %>% # This line adds the topographic map from Garmin
@@ -149,10 +154,6 @@ leaflet(width = "100%") %>% # This line initializes the leaflet map, and sets th
                    group = "Satellite") %>%
   addProviderTiles("Stamen.TonerLabels",
                    group = "Satellite") %>%
-  addPolygons(data = my_county_extent, # This line adds the Whitman county extent polygon
-              label = "My County Extent",
-              fill = FALSE,
-              color = "black") %>%
   addPolygons(data = my_county, # This line adds the Whitman county polygon
               label = "My County",
               fill = FALSE,
@@ -179,19 +180,28 @@ It's obvious from this map that the cell towers aren't merely situated to be in 
   
 In this analysis, we'll be downloading the 1 arc-second elevation data from the NED under our study area. The *FedData* functions each require four basic parameters:
 
-  * A `template` defining your AOI, either supplied as a spatial object ([`spatial*`](https://www.rdocumentation.org/packages/sp/topics/sp) or [`raster*`](https://www.rdocumentation.org/packages/raster/topics/raster) or a spatial [`extent`](https://www.rdocumentation.org/packages/raster/topics/extent) object
+  * A `template` defining your AOI, supplied as a [`spatial*`](https://www.rdocumentation.org/packages/sp/topics/sp), [`raster*`](https://www.rdocumentation.org/packages/raster/topics/raster), or spatial [`extent`](https://www.rdocumentation.org/packages/raster/topics/extent) object
   * A character string (`label`) identifying your AOI, used for file names
   * A character string (`raw.dir`) defining where you want the raw data to be stored; this will be created if necessary
   * A character string (`extraction.dir`) defining where you want the extracted data for your AOI to be stored; this will also be created if necessary
   
-Here, we'll download the 1 arc-second NED with the `get_ned()` function from *FedData*, using the `my_county` *SpatialPolygonsDataFrame* object that we created above as out `template`, and local relative paths for our `raw.dir` and `extraction.dir`. We'll download and prepare the NED, and then plot it using the basic `plot()` function.
+Here, we'll download the 1 arc-second NED with the `get_ned()` function from *FedData*, using the `my_county` object that we created above as out `template`, and local relative paths for our `raw.dir` and `extraction.dir`. We'll download and prepare the NED, and then plot it using the basic `plot()` function.
   
 ```{r}
 # Download the 1 arc-second NED elevation model for our study area
-my_county_NED <- FedData::get_ned(template = my_county,
-                                label = "my_county",
-                                raw.dir = "OUTPUT/RAW/NED",
-                                extraction.dir = "OUTPUT/EXTRACTIONS/NED")
+my_county_NED <- FedData::get_ned(template = my_county %>%
+                                    as("Spatial"), # FedData functions currently expect Spatial* objects, so coerce to a Spatial* object
+                                  label = "my_county",
+                                  raw.dir = "OUTPUT/RAW/NED",
+                                  extraction.dir = "OUTPUT/EXTRACTIONS/NED")
+
+# Mask to the county
+my_county_NED[is.na(over(my_county_NED %>%
+                           as("SpatialPixels"),
+                         my_county %$%
+                           geometry %>%
+                           sf::st_transform(projection(my_county_NED)) %>%
+                           as("Spatial")))] <- NA
 
 # Print the my_county_NED object
 my_county_NED
@@ -201,30 +211,34 @@ my_county_NED %>%
   plot()
 
 # Plot the my_county polygon over the elevation raster
-my_county %>%
+my_county %$% 
+  geometry %>%
   plot(add = T)
 
 ```
 
-The NED elevation data was downloaded for our study area, and **cropped** to the rectangular extent of the county.
+The NED elevation data was downloaded for our study area, **cropped** to the rectangular extent of the county, and then **masked** to the county.
 
 ## Are sites situated based on elevation?
-
+Alright, now that all of our data are in place, we can get to the meat of our analysis: are cell towers in especially high places in Whitman county? Here, we treat Whitman county as the decision-space within which some past cellular engineers decided to build towers---our null hypothesis is that there is no relationship between elevation and cell tower location. Put another way, our task is to rule out whether cell towers were likely to have been placed randomly across the landscape. We'll first **extract** the elevations for the cell towers, then calculate a **probability density estimate** for the cell towers, estimate a probability density curve for the landscape using **Monte Carlo resampling**, and finally compare the two distributions graphically and using a **Mann-Whitney U test**.
 
 ### Extract site elevations
+Extracting the cell tower elevations is straightforward using the `extract()` function from the *raster* package.
 ```{r}
-
 # Extract cell tower elevations from the study area NED values
 cell_towers$`Elevation (m)` <- my_county_NED %>%
-  raster::extract(cell_towers)
+  raster::extract(cell_towers %>%
+                    as("Spatial"))
 
-cell_towers@data
+cell_towers
 ```
 
-### Plot kernel density curves for sites and landscape
+### Calculate kernel density curves for sites and landscape
+We can calculate kernel density curves using the `density()` function.
 ```{r}
 
-cell_towers_densities <- cell_towers$`Elevation (m)` %>%
+cell_towers_densities <- cell_towers %$%
+  `Elevation (m)` %>%
   density(from = 150,
             to = 1250,
             n = 1101) %>% 
@@ -235,14 +249,15 @@ cell_towers_densities <- cell_towers$`Elevation (m)` %>%
                 Frequency = y)
   
 
-# Load the NED elevations into memory for fast bootstrapping
+# Load the NED elevations into memory for fast resampling
 my_county_NED_values <- my_county_NED %>%
-  values()
+  values() %>%
+  na.omit() # Drop all masked (NA) locations
 
 # Draw 999 random samples, and calculate their densities
 my_county_NED_densities <- foreach(n = 1:999, .combine = rbind) %do% {
   my_county_NED_values %>%
-    sample(length(cell_towers),
+    sample(nrow(cell_towers),
            replace = FALSE) %>%
     density(from = 150,
             to = 1250,
@@ -253,13 +268,18 @@ my_county_NED_densities <- foreach(n = 1:999, .combine = rbind) %do% {
 } %>%
   group_by(x) %>%
   # by_slice(~ quantile(.$y, probs = c(0.025, 0.5, 0.975)))
-  do({
+  dplyr::do({
     quantile(.$y, probs = c(0.025, 0.5, 0.975)) %>%
       t() %>%
       tidy()
   }) %>%
   set_names(c("Elevation", "Lower CI", "Frequency", "Upper CI"))
 
+```
+
+### Plot the kernel density curves
+```{r}
+# Plot both distributions using ggplot2, then create an interactive html widget using plotly.
 g <- ggplot() +
   geom_line(data = my_county_NED_densities,
             mapping = aes(x = Elevation,
@@ -274,10 +294,8 @@ g <- ggplot() +
                              y = Frequency),
                color = "red")
 
-ggplotly(g)
-
+ggplotly(g) # Create the HTML widget
 ```
-
 
 ### Mann-Whitney U test comparing non-normal distributions
 ```{r}
@@ -285,7 +303,7 @@ ggplotly(g)
 # Draw 999 random samples from the NED, and compute two-sample Wilcoxon tests (Mann-Whitney U tests)
 my_county_Cell_MWU <- foreach(n = 1:999, .combine = rbind) %do% {
   my_county_sample <- my_county_NED_values %>%
-    sample(length(cell_towers),
+    sample(nrow(cell_towers),
            replace = FALSE) %>%
     wilcox.test(x = cell_towers$`Elevation (m)`,
                 y = .,
@@ -305,12 +323,13 @@ my_county_Cell_MWU <- foreach::foreach(prob = c(0.025,0.5,0.975), .combine = rbi
   magrittr::set_colnames(c("Lower CI","Median","Upper CI")) %>%
   magrittr::set_rownames(c("U statistic","p-value"))
 
+# Write output table as a CSV
 my_county_Cell_MWU %T>%
-  write.csv("OUTPUT/Mann_Whitney_results.csv") # Write output table as a CSV
+  write.csv("OUTPUT/Mann_Whitney_results.csv")
 
 ```
 
-The results of the bootstrapped Mann-Whitney U two-sample tests demonstrate that it is highly likely that the cell towers in Whitman county were placed on unusually high places on the landscape (median U statistic = `r my_county_Cell_MWU["U statistic","Median"]`, median p-value = `r my_county_Cell_MWU["p-value","Median"]`).
+The results of the bootstrapped Mann-Whitney U two-sample tests show that it is highly likely that the cell towers in Whitman county were placed on unusually high places on the landscape (median U statistic = `r my_county_Cell_MWU["U statistic","Median"]`, median p-value = `r my_county_Cell_MWU["p-value","Median"]`).
 
 ## Conclusions
 *R* is extremely powerful as a geo-analytic tool, and encountering sophisticated code for the first time can be daunting. But it can also be useful for exploratory analysis, interactive data presentation, and 
