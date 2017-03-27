@@ -64,8 +64,9 @@ Files may be downloaded in *R* using many different functions, but perhaps the m
 
 ```{r message=FALSE, results='hide'}
 # Download the 1:500000 scale counties shapefile from the US Census
-download.file("http://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_500k.zip",
-              destfile = "OUTPUT/cb_2015_us_county_500k.zip")
+if(!file.exists("OUTPUT/cb_2015_us_county_500k.zip"))
+  download.file("http://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_500k.zip",
+                destfile = "OUTPUT/cb_2015_us_county_500k.zip")
 
 # Unzip the file
 unzip("OUTPUT/cb_2015_us_county_500k.zip",
@@ -111,11 +112,16 @@ my_county %<>%
 ```
 
 ## Reading "site" locations from a table and cropping to a study area
-Alright, now that we've got our study area defined, we can load our "site" data (the cell towers). We can use the `read_csv()` function from the *readr* library to read the cell tower locations straight from where I've archived them online. We'll read them in, and then print them.
+Alright, now that we've got our study area defined, we can load our "site" data (the cell towers). We can use the `read_csv()` function from the *readr* library to read the cell tower locations from a local file, which we download using `download.file()`. We'll read them and then print them.
 
 ```{r message=FALSE}
-# Load cell tower location data straight from the internet using a URL path
-cell_towers <- readr::read_csv("https://raw.githubusercontent.com/bocinsky/r_tutorials/master/data/cell_towers.csv")
+# Download cell tower location data
+if(!file.exists("OUTPUT/cell_towers.csv"))
+  download.file("https://raw.githubusercontent.com/bocinsky/r_tutorials/master/data/cell_towers.csv",
+                destfile = "OUTPUT/cell_towers.csv")
+
+# Load the data
+cell_towers <- readr::read_csv("OUTPUT/cell_towers.csv")
 
 cell_towers
 ```
@@ -220,7 +226,7 @@ my_county %$%
 The NED elevation data was downloaded for our study area, **cropped** to the rectangular extent of the county, and then **masked** to the county.
 
 ## Are sites situated based on elevation?
-Alright, now that all of our data are in place, we can get to the meat of our analysis: are cell towers in especially high places in Whitman county? Here, we treat Whitman county as the decision-space within which some past cellular engineers decided to build towers---our null hypothesis is that there is no relationship between elevation and cell tower location. Put another way, our task is to rule out whether cell towers were likely to have been placed randomly across the landscape. We'll first **extract** the elevations for the cell towers, then calculate a **probability density estimate** for the cell towers, estimate a probability density curve for the landscape using **Monte Carlo resampling**, and finally compare the two distributions graphically and using a **Mann-Whitney U test**.
+Alright, now that all of our data are in place, we can get to the meat of our analysis: are cell towers in especially high places in Whitman county? Here, we treat Whitman county as the [decision space](https://en.wikipedia.org/wiki/Multiple-criteria_decision_analysis) within which some past cellular engineers decided to build towers---our null hypothesis is that there is no relationship between elevation and cell tower location. Put another way, our task is to rule out whether cell towers were likely to have been placed randomly across the landscape. We'll first **extract** the elevations for the cell towers, then calculate a **probability density estimate** for the cell towers, estimate a probability density curve for the landscape using **Monte Carlo resampling**, and finally compare the two distributions graphically and numerically using a **Mann-Whitney U test**.
 
 ### Extract site elevations
 Extracting the cell tower elevations is straightforward using the `extract()` function from the *raster* package.
@@ -234,9 +240,11 @@ cell_towers
 ```
 
 ### Calculate kernel density curves for sites and landscape
-We can calculate kernel density curves using the `density()` function.
+We can calculate kernel density curves using the `density()` function available in all *R* installations. This code block gets a little complicated. The first section is strightforward: we estimate the probability density for all elevations between 150 and 1250 masl (the domain of the county elevation). The second section is a bit more complicated: we estimate probability densities for 99 random samples from the elevation data. (You would probably want to draw more resamples than this in a real analysis). Each sample is of the same number of sites as there are cell towers. This is called Monte Carlo resampling. The code section performs the sampling, then calculates a 95% confidence interval for the sampled data using [quantiles](https://en.wikipedia.org/wiki/Quantile). We will use the [*foreach*](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.pdf) package (and its `%do%` function) to repeat and output the resampling.
 ```{r}
 
+# Calculate the cell tower densities
+# -------------------------
 cell_towers_densities <- cell_towers %$%
   `Elevation (m)` %>%
   density(from = 150,
@@ -247,37 +255,39 @@ cell_towers_densities <- cell_towers %$%
   dplyr::mutate(y = y * 1101) %>%
   dplyr::rename(Elevation = x,
                 Frequency = y)
-  
 
+
+# Calculate possible densities across the study area using resampling
+# -------------------------
 # Load the NED elevations into memory for fast resampling
 my_county_NED_values <- my_county_NED %>%
   values() %>%
   na.omit() # Drop all masked (NA) locations
 
-# Draw 999 random samples, and calculate their densities
-my_county_NED_densities <- foreach(n = 1:999, .combine = rbind) %do% {
+# Draw 99 random samples, and calculate their densities
+my_county_NED_densities <- foreach::foreach(n = 1:99, .combine = rbind) %do% {
   my_county_NED_values %>%
     sample(nrow(cell_towers),
            replace = FALSE) %>%
     density(from = 150,
             to = 1250,
             n = 1101) %>% 
-    tidy() %>%
+    broom::tidy() %>%
     tibble::as_tibble() %>%
-  dplyr::mutate(y = y * 1101)
+    dplyr::mutate(y = y * 1101)
 } %>%
-  group_by(x) %>%
-  # by_slice(~ quantile(.$y, probs = c(0.025, 0.5, 0.975)))
-  dplyr::do({
-    quantile(.$y, probs = c(0.025, 0.5, 0.975)) %>%
+  dplyr::group_by(x) %>%
+  purrr::by_slice(function(x){
+    quantile(x$y, probs = c(0.025, 0.5, 0.975)) %>%
       t() %>%
-      tidy()
-  }) %>%
-  set_names(c("Elevation", "Lower CI", "Frequency", "Upper CI"))
+      broom::tidy()
+  }, .collate = "rows") %>%
+  magrittr::set_names(c("Elevation", "Lower CI", "Frequency", "Upper CI"))
 
 ```
 
 ### Plot the kernel density curves
+We'll perform a statistical test on the cell tower and resampled elevation data in a minute, but first it is just as helpful to view a graph of the two data sets. Like all things, *R* has many different ways of graphing data, but the [*ggplot2*](http://ggplot2.org/) package from [Hadley Wickam](http://hadley.nz/) is fast becoming the framework-*du jour* for graphics in *R*. The [*plotly*](https://plot.ly/r/) package can be used to effortly convert `ggplot2` graphs into interactive HTML graphics. *ggplot2* uses a pipe-like system for building graphs, where graphical elements are appended to one-another using the `+` operator. **Hover over the plot to explore it interactively.**
 ```{r}
 # Plot both distributions using ggplot2, then create an interactive html widget using plotly.
 g <- ggplot() +
@@ -294,14 +304,17 @@ g <- ggplot() +
                              y = Frequency),
                color = "red")
 
-ggplotly(g) # Create the HTML widget
+ggplotly(g)# Create the HTML widget
 ```
 
+This plot is revealing. The landscape data (represented by the black line and gray confidence interval) is left skewed and has two modes at c. 550 and 750 masl. In contrast, the cell tower data has a single dominant mode at c. 780 masl, and is slightly right skewed. From this visual investigation alone, we can see that the cell tower locations were unlikely to have been randomly sampled from the landscape as a whole.
+
 ### Mann-Whitney U test comparing non-normal distributions
+Because neither of these distributions are statistically normal, we will use the nonparametric [Mann-Whitney U test](https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test) (also known as a Wilcoxon test) to test whether the cell tower locations were likely a random sample of locations drawn from our study area. Again, we'll use Monte Carlo resampling to generate confidence intervals for our test statistic. Finally, we will output the test data to a comma-seperated values (CSV) file for inclusion in external reports.
 ```{r}
 
 # Draw 999 random samples from the NED, and compute two-sample Wilcoxon tests (Mann-Whitney U tests)
-my_county_Cell_MWU <- foreach(n = 1:999, .combine = rbind) %do% {
+my_county_Cell_MWU <- foreach(n = 1:99, .combine = rbind) %do% {
   my_county_sample <- my_county_NED_values %>%
     sample(nrow(cell_towers),
            replace = FALSE) %>%
@@ -315,6 +328,7 @@ my_county_Cell_MWU <- foreach(n = 1:999, .combine = rbind) %do% {
 } %>%
   dplyr::select(statistic, p.value)
 
+# Get the median test statistic and 95% confidence interval
 my_county_Cell_MWU <- foreach::foreach(prob = c(0.025,0.5,0.975), .combine = rbind) %do% {
   my_county_Cell_MWU %>%
       dplyr::summarise_all(quantile, probs = prob)
@@ -329,10 +343,9 @@ my_county_Cell_MWU %T>%
 
 ```
 
-The results of the bootstrapped Mann-Whitney U two-sample tests show that it is highly likely that the cell towers in Whitman county were placed on unusually high places on the landscape (median U statistic = `r my_county_Cell_MWU["U statistic","Median"]`, median p-value = `r my_county_Cell_MWU["p-value","Median"]`).
+The results of the Mann-Whitney U two-sample tests show that it is highly unlikely that the cell towers in Whitman county were randomly placed across the landscape (median U statistic = `r my_county_Cell_MWU["U statistic","Median"]`, median p-value = `r my_county_Cell_MWU["p-value","Median"]`). We can infer from the graphical analysis above that the cell towers were placed on unusually high places across the landscape.
 
 ## Conclusions
 *R* is extremely powerful as a geo-analytic tool, and encountering sophisticated code for the first time can be daunting. But it can also be useful for exploratory analysis, interactive data presentation, and 
-
 
 ## References cited
