@@ -1,0 +1,451 @@
+---
+title: "Climate Data in R"
+author: "Kyle Bocinsky"
+format: 
+  revealjs:
+    smaller: true
+    scrollable: true
+    code-copy: true
+    # logo: mco.png
+    # footer: "Footer text"
+editor: source
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  eval = TRUE
+)
+```
+
+## Topics for today
+
+In today's lesson, you will learn to:
+
+1. Define an area of interest using the `AOI` package
+2. Download weather station data using the `rnoaa` package
+3. Access data from the NWIS via HTTP calls using `httr2`
+4. ~~Access gridded climate data using the `climateR` package~~
+
+## Setup: packages
+
+:::: {.columns}
+::: {.column width="50%"}
+**[`remotes`](https://remotes.r-lib.org)** --- install R Packages from remote or local repositories
+
+**[`httr2`](https://httr2.r-lib.org)** --- modern HTTP requests in R
+
+**[`tidyverse`](https://www.tidyverse.org)** --- packages for "tidy" data manipulation
+
+-   [`tibble`](https://tibble.tidyverse.org) --- simple, modern `data.frame` objects
+-   [`tidyr`](https://tidyr.tidyverse.org) --- functions to help make and keep data tidy
+-   [`dplyr`](https://dplyr.tidyverse.org) --- a grammar of tabular data manipulation
+-   [`readr`](https://readr.tidyverse.org) --- fast and simple data from delimited files
+-   [`ggplot2`](https://ggplot2.tidyverse.org) --- a grammar of graphics
+:::
+
+::: {.column width="50%"}
+
+**Spatial packages**
+
+-   [`sf`](https://r-spatial.github.io/sf/) --- geospatial vector data in R
+-   [`terra`](https://rspatial.github.io/terra/) --- geospatial raster data in R
+-   [`mapview`](https://r-spatial.github.io/mapview/) --- quick and easy web-mapping in R
+
+**Data packages**
+
+-   [`rnoaa`](https://docs.ropensci.org/rnoaa/) --- NOAA weather data in R
+-   [`AOI`](https://mikejohnson51.github.io/AOI/) --- simple area of interest definitions 
+-   [`climateR`](https://github.com/mikejohnson51/climateR) --- access to an climate data smorgasbord
+-   [`FedData`](https://docs.ropensci.org/FedData/) --- access to other federated datasets
+:::
+::::
+
+## Setup: installation
+
+```{r}
+#| echo: true
+#| fig-align: "center"
+## Install packages if you haven't already done so
+# install.packages(
+#   c(
+#     "tidyverse", 
+#     "remotes", 
+#     "httr2",
+#     "sf",
+#     "terra",
+#     "mapview",
+#     "rnoaa"
+#   ),
+#   repos = "https://cloud.r-project.org"
+# ) 
+# 
+# remotes::install_github("mikejohnson51/AOI")
+# remotes::install_github("mikejohnson51/climateR")
+
+library(tidyverse)
+library(sf)
+library(terra)
+
+```
+
+## Area of Interest
+
+The `AOI` package can be used to easily define a custom area of interest.
+We will use the `AOI::aoi_get()` function to get the boundary for Washoe county, 
+and save it as an object in R. 
+Then, we will create a simple web map using the `mapview::mapview()` function.
+
+```{r}
+#| echo: true
+#| fig-align: "center"
+#| output-location: "column"
+#| panel: "fill"
+washoe <- 
+  AOI::aoi_get(
+    state = "NV", 
+    county = "Washoe"
+  )
+
+mapview::mapview(washoe,
+                 label = "name")
+```
+
+## Area of Interest
+There are many other ways to specify areas of interest, including:
+
+**Points**
+```{r}
+#| echo: true
+#| fig-align: "center"
+#| output-location: "column"
+#| panel: "fill"
+AOI::geocode(
+  'University of Nevada, Reno', 
+  pt = TRUE
+) %>%
+  mapview::mapview(label = "request")
+```
+
+## Area of Interest
+There are many other ways to specify areas of interest, including:
+
+**Addresses**
+```{r}
+#| echo: true
+#| fig-align: "center"
+#| output-location: "column"
+#| panel: "fill"
+AOI::geocode(
+  '2215 Raggio Parkway, Reno, NV 89512', 
+  pt = TRUE
+) %>%
+  mapview::mapview(label = "request")
+```
+
+## Area of Interest
+There are many other ways to specify areas of interest, including:
+
+**Bounding Boxes**
+```{r}
+#| echo: true
+#| fig-align: "center"
+#| output-location: "column"
+#| panel: "fill"
+AOI::geocode(
+  "Washoe County, NV",
+  bb = TRUE
+) %>%
+  mapview::mapview(label = "request")
+
+```
+## Weather data with `rnoaa`
+`rnoaa` is an interface to many NOAA datasets, including the Global Historical Climatology Dataset of daily weather station summaries. 
+
+Data sources include:
+
+:::: {.columns}
+::: {.column width="50%"}
+
+* [NOAA NCDC climate](https://www.ncdc.noaa.gov/cdo-web/webservices/v2)
+* [Severe weather](https://www.ncdc.noaa.gov/swdiws/)
+* [Sea ice](ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/shapefiles)
+* [NOAA buoy](https://www.ndbc.noaa.gov/)
+* [ERDDAP](https://upwell.pfeg.noaa.gov/erddap/index.html)
+* [Tornadoes from the NOAA Storm Prediction Center](https://www.spc.noaa.gov/gis/svrgis/)
+
+:::
+
+::: {.column width="50%"}
+
+* [Historical Observing Metadata Repository (HOMR)](http://www.ncdc.noaa.gov/homr/api)
+* [Extended Reconstructed Sea Surface Temperature (ERSST)](https://www.ncdc.noaa.gov/data-access/marineocean-data/extended-reconstructed-sea-surface-temperature-ersst-v4)
+* [Argo buoys](http://www.argo.ucsd.edu/)
+* [CO-OPS tides and currents data](https://tidesandcurrents.noaa.gov/)
+* [Climate Prediction Center (CPC)](http://www.cpc.ncep.noaa.gov/)
+
+:::
+
+::::
+
+## Weather data with `rnoaa`
+We are going to focus on GHCN daily data. This analysis comes from the [Native Climate project](https://native-climate.com), where reporting intern Robin Smuda requested data on [changing willow harvest timing](https://native-climate.com/2022/09/restoring-our-relationship-with-himu-willow-requires-human-interaction-rather-than-protection/) on the Washoe Reservation.
+
+Coyote Willow, or *hímu* in the Washoe language, is essential for traditional Washoe basket weaving. Willow needs to be harvested prior to flowering but after the spring thaw in order to be workable for weaving, usually during the first week of above-freezing weather. Washoe artisans had noted to Robin that the timing of that critical period has been changing.
+
+Specifically, Robin wanted to know when the first warm spell (at least 7 consecutive days where the minimum daily temperature rose above 28 ºF, after March 1) has occurred in each year since 1950.
+
+## Weather data with `rnoaa`
+Native Climate intern Paige Johnson decided to use daily data from the GHCN to perform the analysis. First she needed to **identify a nearby GHCN station** to use in the analysis. 
+
+Here, we use the `rnoaa::ghcnd_stations()` function to retrieve a catalog of GHCN stations, and identify candidate stations within Douglas County, NV.
+
+```{r}
+#| echo: true
+#| fig-align: "center"
+#| output-location: "column"
+#| panel: "fill"
+
+# Get the boundary for Douglas County, NV
+douglas <- 
+  AOI::aoi_get(
+    state = "NV", 
+    county = "Douglas"
+  )
+
+# Get the GHCN station inventory
+douglas_stations <-
+  rnoaa::ghcnd_stations() %>%
+  # Filter for stations that report minimum temperature
+  dplyr::filter(element == "TMIN") %>%
+  # Convert into a spatial object
+  sf::st_as_sf(coords = c("longitude", "latitude"),
+               crs = "WGS84") %>%
+  # Find stations within Douglas County
+  sf::st_intersection(douglas)
+
+mapview::mapview(douglas_stations,
+                 label = "name")
+
+```
+
+## Weather data with `rnoaa`
+We decided to use the station from Minden, NV, which had a long, relatively complete record and was within the Washoe Reservation. We use the `rnoaa::meteo_tidy_ghcnd()` function, which cleans the GHCN data into a tidy format.
+
+```{r}
+#| echo: true
+#| fig-align: "center"
+#| output-location: "column"
+#| panel: "fill"
+
+# Get the daily temperature data for Minden, NV
+ghcn_minden <-
+  rnoaa::meteo_tidy_ghcnd("USC00265191",
+                          var = "tmin") %>%
+  # add missing days to the dataset
+  dplyr::full_join(.,
+                   tibble::tibble(date = seq(min(.$date), 
+                                             max(.$date),
+                                             "1 day")),
+                   by = "date"
+  ) %>%
+  # Make sure the table is sorted by date
+  dplyr::arrange(date) %>%
+  # "mutate" performs operations on variables, 
+  # and creates new ones
+  dplyr::mutate(
+    # tmin in GHCN are in tenths of ºC
+    # Set units, then convert to degrees F
+    tmin = 
+      units::set_units(tmin / 10, "deg_C") %>%
+      units::set_units("deg_F"),
+    # Identify days where the minimum temperature is > 28ºF
+    `> 28F` = tmin > units::set_units(28, "deg_F"),
+    # disqualify missing data 
+    `> 28F` = ifelse(is.na(`> 28F`), FALSE, `> 28F`)
+  )
+
+ghcn_minden %>%
+  dplyr::select(date, tmin, `> 28F`
+  ) %>%
+  dplyr::filter(date >= "1950-03-01") %>%
+  head(10) %>%
+  knitr::kable()
+
+```
+
+## Weather data with `rnoaa`
+Now that we have the data in shape, it is time to identify the warm spells. Here, we develop an algorithm to do so (you can peruse the comments later) and then plot the data from 1950 to today. 
+
+```{r}
+#| echo: true
+#| fig-align: "center"
+#| output-location: "column"
+
+ghcn_minden_warm_spells <-
+  ghcn_minden %>%
+  # Calculate Warm Spell Start as the first day with a TMIN greater than 28F
+  # Calculate Warm Spell End as the last consecutive day with TMIN greater than 28F
+  dplyr::mutate(`Warm Spell Start` = as.logical(c(1, diff(`> 28F`) == 1)),
+                `Warm Spell End` = c(diff(`> 28F`), -1) == -1)  %>%
+  # Make a subset of data for Warm Spell Start and Warm Spell End
+  dplyr::filter(`Warm Spell Start` | `Warm Spell End`) %$%
+  # Create a new dataset that includes Warm Spell Start and End dates
+  tibble::tibble(`Warm Spell Start` = date[`Warm Spell Start`],
+                 `Warm Spell End` = date[`Warm Spell End`][1:length(`Warm Spell Start`)]) %>%
+  # Show year and day of year for the Warm Spell Start
+  # Show day of year for Warm Spell End 
+  # Determine the number of days between Warm Spell Start and Warm Spell End
+  # Add 1 to this value to get the correct number
+  dplyr::mutate(`Warm Spell Start Year` = lubridate::year(`Warm Spell Start`),
+                `Warm Spell Start DOY` = lubridate::yday(`Warm Spell Start`),
+                `Warm Spell End DOY` = lubridate::yday(`Warm Spell End`),
+                Length = (`Warm Spell End` - `Warm Spell Start`) + 1) %>%
+  
+  dplyr::filter(
+    # Get periods of longer than a week
+    Length >= 7,
+    # That occur after March 1
+    lubridate::month(`Warm Spell Start`) >= 3) %>%
+  dplyr::group_by(`Warm Spell Start Year`) %>%
+  # Get the first warm spell of each year
+  dplyr::filter(`Warm Spell Start` == min(`Warm Spell Start`))
+
+ghcn_minden_warm_spells %>%
+  dplyr::select(Year = `Warm Spell Start Year`,
+                `Start DOY` = `Warm Spell Start DOY`,
+                `End DOY` = `Warm Spell End DOY`,
+                Duration = Length
+  ) %>%
+  dplyr::filter(Year >= 1950) %>%
+  head(10) %>%
+  knitr::kable()
+
+```
+
+## Weather data with `rnoaa`
+Now that we have the data in shape, it is time to identify the warm spells. Here, we develop an algorithm to do so (you can peruse the comments later) and then plot the data from 1950 to today.
+
+```{r}
+#| echo: true
+#| fig-align: "center"
+#| fig-asp: 0.8
+#| output-location: "column"
+
+# Find the slope of a linear model regressing the
+# start of the warm spells on the year.
+# lm(`Warm Spell Start DOY` ~ `Warm Spell Start Year`,
+#      data = ghcn_minden_warm_spells %>%
+#      dplyr::filter(`Warm Spell Start Year` >= 1950)) %>%
+#   summary()
+# -0.35 days/year, 3.5 days/decade, or 1 week/20 years
+
+# Create a plot that shows the start date of the warm spells
+# and a loess smooth of 
+ghcn_minden_warm_spells %>%
+  ggplot(aes(x = `Warm Spell Start Year`,
+             y = `Warm Spell Start DOY`)) +
+  geom_line() +
+  geom_smooth(method = "loess") +
+  scale_y_continuous(name = "Warm Spell Start\nDay of Year",
+                     limits = c(50, 150)) +
+  scale_x_continuous(limits = c(1950, NA))
+```
+
+
+
+## Calling APIs (for data you can't get elsewhere)
+Sometimes, there isn't a good R package for accessing some type of data, but there is an Application Programming Interface (API) that enables querying and retrieving the data. An example is the National Water Information System (NWIS, but see the [`dataRetrieval`](https://rconnect.usgs.gov/dataRetrieval/) package).
+
+Here, we'll explore the NWIS API, whose documentation are available here:
+
+<https://waterservices.usgs.gov/rest/Site-Service.html>
+
+Our goal is to map all the active stream gauges in Washoe County.
+
+## Calling APIs (for data you can't get elsewhere)
+We'll use the `httr2` package, which is a very modern library for making HTTP requests in R. `httr2` is *very* powerful, and we'll only skim the surface of it here.
+
+In `httr2`, you start by creating a request:
+
+```{r}
+#| echo: true
+
+req <- httr2::request("https://waterservices.usgs.gov/nwis/site/")
+
+httr2::req_dry_run(req)
+
+```
+
+Every request starts with a URL, which in this case points to the NWIS API server. The `httr2::req_dry_run()` function provides some information about what type of request it would perform if you told it to.
+
+## Calling APIs (for data you can't get elsewhere)
+We modify URLs by adding *queries* using the `httr2::req_url_query()` function. A query consists of a set of parameters to the URL that control what the response is. In this case, looking at the [NWIS API documentation](https://waterservices.usgs.gov/rest/Site-Service.html), we can see that we are able to specify parameters for county, site type, and site status. We can add those parameters to the request.
+
+```{r}
+#| echo: true
+
+req <- 
+  httr2::request("https://waterservices.usgs.gov/nwis/site/") %>%
+  httr2::req_url_query(countyCd = "32031",
+                       siteType="ST",
+                       siteStatus = "active")
+
+req
+
+```
+
+Try copying a pasting the request into your browser. What happens?
+
+<`r req$url`>
+
+## Calling APIs (for data you can't get elsewhere)
+We make the request by using the `httr2::req_perform()` function. We can then view the raw "body" of the response, and parse it using `readr::read_tsv()`.
+
+```{r}
+#| echo: true
+
+# Perform the request
+washoe_stream_gauges <-
+  httr2::req_perform(req) %>%
+  # Get the raw body of the response
+  httr2::resp_body_raw() %>%
+  # Parse the response, which is a tsv
+  readr::read_tsv(comment = "#")
+
+# Drop the first row, which are the class of the data
+washoe_stream_gauges[-1,] %>%
+    # Convert into a spatial object
+  sf::st_as_sf(coords = c("dec_long_va", "dec_lat_va"),
+               crs = "WGS84") %>%
+mapview::mapview(label = "station_nm")
+
+```
+
+## COGS: Gridded data from the Cloud
+**PRO TIP**: We aren't going to have time to go through this, but data that are in Cloud-Optimized GeoTiff (COG) format and are stored in the "cloud" (Amazon S3 buckets, for instance) can be loaded into `terra` directly, and cropped *prior to retrieval from the host server*. This is a really powerful way to get at cloud-hosted geospatial data.
+
+For example, median June temperature from the NASA NEX-GDDP downscaled CMIP6 climate projections, cropped to Nevada:
+
+```{r}
+#| echo: true
+#| fig-align: "center"
+#| output-location: "column"
+#| panel: "fill"
+
+terra::rast(
+  "https://nex-gddp-cmip6-cog.s3-us-west-2.amazonaws.com/monthly/CMIP6_ensemble_median/tas/tas_month_ensemble-median_ssp585_209906.tif"
+  ) %>%
+  # Crop and mask to Nevada
+  terra::crop(AOI::aoi_get(state = "Nevada"),
+              mask = TRUE) %>%
+  # Convert from K to ºF
+  {
+    (. - 273.15) * 9/5 + 32
+  } %>%
+  plot()
+
+```
+

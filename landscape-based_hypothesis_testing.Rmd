@@ -4,7 +4,7 @@ author: "Kyle Bocinsky"
 date: "3/26/2017"
 output:
   html_document:
-    code_folding: show
+    code_folding: hide
   html_notebook: default
 # csl: journal-of-archaeological-science-reports.csl
 bibliography: references.bib
@@ -39,7 +39,7 @@ Almost all *R* scripts require that you load packages that enable the functions 
 knitr::opts_chunk$set(echo = TRUE)
 
 packages <- c("magrittr", # For piping
-              "foreach", "purrr", "tibble", "dplyr", "tidyr", "broom", # For tidy data analysis
+              "foreach", "purrr", "purrrlyr", "tibble", "dplyr", "tidyr", "broom", # For tidy data analysis
               "ggplot2","plotly", # For fancy graphs
               "sf", "sp", "raster", # For spatial analysis
               "leaflet", "htmltools", # For fancy maps
@@ -277,7 +277,7 @@ my_county_NED_densities <- foreach::foreach(n = 1:99, .combine = rbind) %do% {
     dplyr::mutate(y = y * 1101)
 } %>%
   dplyr::group_by(x) %>%
-  purrr::by_slice(function(x){
+  purrrlyr::by_slice(function(x){
     quantile(x$y, probs = c(0.025, 0.5, 0.975)) %>%
       t() %>%
       broom::tidy()

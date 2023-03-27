@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="environmental-climate-data-r_files/libs/clipboard/clipboard.min.js"></script>
+<script src="environmental-climate-data-r_files/libs/quarto-html/tabby.min.js"></script>
+<script src="environmental-climate-data-r_files/libs/quarto-html/popper.min.js"></script>
+<script src="environmental-climate-data-r_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="environmental-climate-data-r_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="environmental-climate-data-r_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="environmental-climate-data-r_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.2.475">
+
+  <meta name="author" content="Kyle Bocinsky">
+  <title>Climate Data in R</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="environmental-climate-data-r_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="environmental-climate-data-r_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="environmental-climate-data-r_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+  <link href="environmental-climate-data-r_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="environmental-climate-data-r_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="environmental-climate-data-r_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="environmental-climate-data-r_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-captioned.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-captioned) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-captioned.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-captioned .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-captioned .callout-caption  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-captioned.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-captioned.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-caption {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-caption {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-caption {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-captioned .callout-body > .callout-content > :last-child {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.callout-captioned .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-captioned) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-caption {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-caption {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-caption {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-caption {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-caption {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <script src="environmental-climate-data-r_files/libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+  <script src="environmental-climate-data-r_files/libs/jquery-1.12.4/jquery.min.js"></script>
+  <link href="environmental-climate-data-r_files/libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+  <script src="environmental-climate-data-r_files/libs/leaflet-1.3.1/leaflet.js"></script>
+  <link href="environmental-climate-data-r_files/libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+  <script src="environmental-climate-data-r_files/libs/proj4-2.6.2/proj4.min.js"></script>
+  <script src="environmental-climate-data-r_files/libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+  <link href="environmental-climate-data-r_files/libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+  <script src="environmental-climate-data-r_files/libs/leaflet-binding-2.1.2/leaflet.js"></script>
+  <script src="environmental-climate-data-r_files/libs/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script>
+  <script src="environmental-climate-data-r_files/libs/leaflet-providers-plugin-2.1.2/leaflet-providers-plugin.js"></script>
+  <link href="environmental-climate-data-r_files/libs/HomeButton-0.0.1/home-button.css" rel="stylesheet">
+  <script src="environmental-climate-data-r_files/libs/HomeButton-0.0.1/home-button.js"></script>
+  <script src="environmental-climate-data-r_files/libs/HomeButton-0.0.1/easy-button-src.min.js"></script>
+  <script src="environmental-climate-data-r_files/libs/clipboard-0.0.1/setClipboardText.js"></script>
+  <link href="environmental-climate-data-r_files/libs/mapviewCSS-0.0.1/mapview-popup.css" rel="stylesheet">
+  <link href="environmental-climate-data-r_files/libs/mapviewCSS-0.0.1/mapview.css" rel="stylesheet">
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Climate Data in R</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Kyle Bocinsky 
+</div>
+</div>
+</div>
+
+</section>
+<section id="topics-for-today" class="slide level2">
+<h2>Topics for today</h2>
+<p>In today’s lesson, you will learn to:</p>
+<ol type="1">
+<li>Define an area of interest using the <code>AOI</code> package</li>
+<li>Download weather station data using the <code>rnoaa</code> package</li>
+<li>Access data from the NWIS via HTTP calls using <code>httr2</code></li>
+<li><del>Access gridded climate data using the <code>climateR</code> package</del></li>
+</ol>
+</section>
+<section id="setup-packages" class="slide level2">
+<h2>Setup: packages</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong><a href="https://remotes.r-lib.org"><code>remotes</code></a></strong> — install R Packages from remote or local repositories</p>
+<p><strong><a href="https://httr2.r-lib.org"><code>httr2</code></a></strong> — modern HTTP requests in R</p>
+<p><strong><a href="https://www.tidyverse.org"><code>tidyverse</code></a></strong> — packages for “tidy” data manipulation</p>
+<ul>
+<li><a href="https://tibble.tidyverse.org"><code>tibble</code></a> — simple, modern <code>data.frame</code> objects</li>
+<li><a href="https://tidyr.tidyverse.org"><code>tidyr</code></a> — functions to help make and keep data tidy</li>
+<li><a href="https://dplyr.tidyverse.org"><code>dplyr</code></a> — a grammar of tabular data manipulation</li>
+<li><a href="https://readr.tidyverse.org"><code>readr</code></a> — fast and simple data from delimited files</li>
+<li><a href="https://ggplot2.tidyverse.org"><code>ggplot2</code></a> — a grammar of graphics</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><strong>Spatial packages</strong></p>
+<ul>
+<li><a href="https://r-spatial.github.io/sf/"><code>sf</code></a> — geospatial vector data in R</li>
+<li><a href="https://rspatial.github.io/terra/"><code>terra</code></a> — geospatial raster data in R</li>
+<li><a href="https://r-spatial.github.io/mapview/"><code>mapview</code></a> — quick and easy web-mapping in R</li>
+</ul>
+<p><strong>Data packages</strong></p>
+<ul>
+<li><a href="https://docs.ropensci.org/rnoaa/"><code>rnoaa</code></a> — NOAA weather data in R</li>
+<li><a href="https://mikejohnson51.github.io/AOI/"><code>AOI</code></a> — simple area of interest definitions</li>
+<li><a href="https://github.com/mikejohnson51/climateR"><code>climateR</code></a> — access to an climate data smorgasbord</li>
+<li><a href="https://docs.ropensci.org/FedData/"><code>FedData</code></a> — access to other federated datasets</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="setup-installation" class="slide level2">
+<h2>Setup: installation</h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="do">## Install packages if you haven't already done so</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="co"># install.packages(</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#   c(</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#     "tidyverse", </span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#     "remotes", </span></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#     "httr2",</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="co">#     "sf",</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="co">#     "terra",</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co">#     "mapview",</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co">#     "rnoaa"</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="co">#   ),</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co">#   repos = "https://cloud.r-project.org"</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="co"># ) </span></span>
+<span id="cb1-14"><a href="#cb1-14"></a><span class="co"># </span></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="co"># remotes::install_github("mikejohnson51/AOI")</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="co"># remotes::install_github("mikejohnson51/climateR")</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a></span>
+<span id="cb1-18"><a href="#cb1-18"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-19"><a href="#cb1-19"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-20"><a href="#cb1-20"></a><span class="fu">library</span>(terra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="area-of-interest" class="slide level2">
+<h2>Area of Interest</h2>
+<p>The <code>AOI</code> package can be used to easily define a custom area of interest. We will use the <code>AOI::aoi_get()</code> function to get the boundary for Washoe county, and save it as an object in R. Then, we will create a simple web map using the <code>mapview::mapview()</code> function.</p>
+<div class="cell panel-fill columns column-output-location" data-layout-align="center">
+<div class="column">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>washoe <span class="ot">&lt;-</span> </span>
+<span id="cb2-2"><a href="#cb2-2"></a>  AOI<span class="sc">::</span><span class="fu">aoi_get</span>(</span>
+<span id="cb2-3"><a href="#cb2-3"></a>    <span class="at">state =</span> <span class="st">"NV"</span>, </span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="at">county =</span> <span class="st">"Washoe"</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>  )</span>
+<span id="cb2-6"><a href="#cb2-6"></a></span>
+<span id="cb2-7"><a href="#cb2-7"></a>mapview<span class="sc">::</span><span class="fu">mapview</span>(washoe,</span>
+<span id="cb2-8"><a href="#cb2-8"></a>                 <span class="at">label =</span> <span class="st">"name"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column">
+<div class="cell-output-display">
+
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-18871d15194c64449524" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-18871d15194c64449524">{"x":{"options":{"minZoom":1,"maxZoom":52,"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"preferCanvas":false,"bounceAtZoomLimits":false,"maxBounds":[[[-90,-370]],[[90,370]]]},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron","CartoDB.Positron","CartoDB.Positron",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatter","CartoDB.DarkMatter","CartoDB.DarkMatter",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap","OpenStreetMap","OpenStreetMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldImagery","Esri.WorldImagery","Esri.WorldImagery",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenTopoMap","OpenTopoMap","OpenTopoMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"createMapPane","args":["polygon",420]},{"method":"addPolygons","args":[[[[{"lng":[-119.712645,-119.71407,-119.69652,-119.695957,-119.677476,-119.677414,-119.658501,-119.658821,-119.668134,-119.668102,-119.677527,-119.677527,-119.685415,-119.685464,-119.677271,-119.677,-119.657145,-119.656582,-119.655069,-119.69609,-119.695643,-119.689054,-119.685003,-119.677368,-119.669786,-119.664926,-119.652478,-119.643529,-119.633445,-119.626747,-119.621697,-119.619456,-119.618865,-119.61584,-119.6088,-119.608809,-119.60563,-119.596152,-119.585608,-119.571541,-119.550588,-119.540855,-119.536683,-119.531021,-119.515254,-119.511744,-119.503464,-119.498497,-119.490008,-119.485783,-119.476271,-119.472651,-119.469334,-119.471218,-119.468396,-119.468413,-119.457894,-119.453933,-119.451941,-119.444476,-119.439444,-119.422038,-119.412885,-119.40482,-119.392314,-119.389378,-119.38156,-119.370604,-119.364279,-119.357868,-119.346627,-119.339532,-119.332326,-119.328381,-119.322048,-119.317907,-119.314024,-119.307672,-119.304618,-119.29389,-119.291456,-119.283116,-119.276902,-119.257342,-119.189344,-119.189327,-119.170641,-119.170577,-119.171145,-119.171261,-119.170899,-119.189707,-119.189761,-119.208543,-119.208338,-119.208328,-119.208628,-119.226139,-119.22527,-119.225056,-119.225176,-119.250106,-119.251006,-119.339296,-119.338661,-119.338814,-119.337783,-119.338399,-119.338539,-119.338504,-119.313037,-119.312891,-119.313232,-119.311903,-119.311368,-119.312133,-119.311361,-119.309364,-119.309266,-119.309598,-119.329791,-119.329764,-119.33142,-119.331045,-119.33115,-119.331068,-119.305713,-119.304169,-119.304638,-119.304635,-119.323955,-119.323079,-119.321768,-119.322022,-119.321102,-119.321112,-119.327027,-119.327325,-119.327374,-119.327135,-119.326848,-119.327128,-119.326956,-119.32482,-119.324971,-119.324239,-119.324184,-119.360122,-119.455515,-119.574007,-119.613241,-119.67308,-119.710989,-119.755983,-119.791174,-119.888772,-119.948657,-119.986801,-119.999234,-119.999332,-119.999276,-119.998295,-119.998698,-119.998861,-119.998287,-119.999046,-119.999471,-119.999635,-119.999699,-120.000073,-119.99976,-119.999866,-119.999799,-120.000039,-119.999801,-119.999875,-119.999418,-119.999295,-119.998657,-119.998785,-119.998098,-119.996811,-119.996644,-119.995976,-119.995598,-119.995705,-119.996536,-119.996265,-119.996659,-119.997006,-119.997002,-119.997352,-119.99722,-119.997903,-119.998498,-119.999081,-119.999174,-119.999941,-120.000489,-120.000548,-120.001133,-120.001062,-120.000959,-120.00114,-120.00082,-120.001947,-120.001736,-120.002375,-120.003773,-120.006127,-120.006323,-120.006473,-120.00568,-120.005727,-120.00453,-120.004297,-120.000801,-119.880787,-119.880802,-119.862103,-119.862517,-119.853265,-119.85326,-119.843883,-119.843933,-119.826716,-119.826731,-119.817526,-119.80952,-119.798856,-119.79886,-119.770871,-119.770872,-119.752168,-119.752093,-119.743052,-119.715297,-119.712645],"lat":[39.250871,39.259175,39.259145,39.280903,39.280871,39.331655,39.331544,39.346088,39.346216,39.360798,39.360647,39.375095,39.375063,39.389575,39.389575,39.404471,39.404111,39.431452,39.447479,39.447463,39.520023,39.520104,39.518519,39.512838,39.511367,39.508516,39.508327,39.512629,39.512789,39.510861,39.511602,39.513866,39.5187,39.522629,39.527228,39.531169,39.533073,39.542618,39.547482,39.551154,39.560872,39.563706,39.560983,39.565974,39.564099,39.562281,39.562366,39.564152,39.562896,39.565557,39.567171,39.565954,39.569908,39.575833,39.579423,39.582943,39.588838,39.589243,39.586701,39.585124,39.587241,39.587937,39.590684,39.58982,39.58576,39.587914,39.588397,39.586882,39.595474,39.597857,39.597604,39.596612,39.600544,39.600669,39.603634,39.607497,39.607421,39.61295,39.612924,39.617497,39.620684,39.622317,39.622271,39.65132,39.651423,39.68048,39.680453,39.722788,39.722791,39.76649,39.788288,39.788221,39.809994,39.809967,39.824472,39.882383,39.899459,39.899449,39.914092,39.986702,39.999385,39.999207,39.99872,39.998609,40.124905,40.249904,40.354928,40.386419,40.476878,40.517805,40.518314,40.615814,40.624901,40.74402,40.7499,40.781746,40.800373,40.868702,40.931012,40.960378,40.960394,40.989616,41.039047,41.124913,41.197264,41.235118,41.234542,41.30768,41.325883,41.414695,41.414519,41.428971,41.474732,41.489284,41.529073,41.590915,41.590584,41.648934,41.686285,41.784354,41.812717,41.84236,41.856903,41.856904,41.874908,41.944542,41.993923,41.994278,41.995717,41.995752,41.995909,41.996342,41.996182,41.996545,41.997384,41.997422,41.996736,41.995709,41.994944,41.907702,41.874895,41.749915,41.720632,41.624937,41.618818,41.521809,41.499894,41.429679,41.36511,41.249758,41.236061,41.183974,41.155921,41.082999,41.022211,40.999894,40.916761,40.873084,40.794156,40.77385,40.721257,40.624764,40.599447,40.57055,40.438366,40.37583,40.318131,40.274521,40.200694,40.186235,40.142579,40.099991,40.069812,39.981636,39.952568,39.906156,39.874913,39.83758,39.797269,39.775223,39.752229,39.722418,39.680613,39.635795,39.606828,39.548724,39.530583,39.491087,39.445056,39.374106,39.316496,39.272878,39.244038,39.225828,39.187445,39.165603,39.165692,39.165509,39.17091,39.171148,39.185639,39.185755,39.193022,39.193152,39.200776,39.200819,39.207988,39.208024,39.209427,39.208038,39.215238,39.215285,39.229832,39.229892,39.244385,39.244065,39.244283,39.250871]}]]],null,"washoe",{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"pane":"polygon","stroke":true,"color":"#333333","weight":0.5,"opacity":0.9,"fill":true,"fillColor":"#6666FF","fillOpacity":0.6,"smoothFactor":1,"noClip":false},"<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>1&emsp;<\/td><\/tr><tr><td>1<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>2<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>3<\/td><th>feature_code&emsp;<\/th><td>0858608&emsp;<\/td><\/tr><tr><td>4<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>5<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>6<\/td><th>name&emsp;<\/th><td>Washoe&emsp;<\/td><\/tr><tr><td>7<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>8<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>9<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>10<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>11<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>12<\/td><th>land_area&emsp;<\/th><td>16358044341&emsp;<\/td><\/tr><tr><td>13<\/td><th>water_area&emsp;<\/th><td>582738419&emsp;<\/td><\/tr><tr><td>14<\/td><th>fip_code&emsp;<\/th><td>32031&emsp;<\/td><\/tr><tr><td>15<\/td><th>geometry&emsp;<\/th><td>sfc_MULTIPOLYGON&emsp;<\/td><\/tr><\/table><\/div>",{"maxWidth":800,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"closeOnClick":true,"className":""},"Washoe",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},{"stroke":true,"weight":1,"opacity":0.9,"fillOpacity":0.84,"bringToFront":false,"sendToBack":false}]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]},{"method":"addHomeButton","args":[-120.006473,39.165509,-119.170577,41.997422,true,"washoe","Zoom to washoe","<strong> washoe <\/strong>","bottomright"]},{"method":"addLayersControl","args":[["CartoDB.Positron","CartoDB.DarkMatter","OpenStreetMap","Esri.WorldImagery","OpenTopoMap"],"washoe",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"addLegend","args":[{"colors":["#6666FF"],"labels":["washoe"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"","extra":null,"layerId":null,"className":"info legend","group":"washoe"}]}],"limits":{"lat":[39.165509,41.997422],"lng":[-120.006473,-119.170577]},"fitBounds":[39.165509,-120.006473,41.997422,-119.170577,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n      function(el, x, data) {\n      // get the leaflet map\n      var map = this; //HTMLWidgets.find('#' + el.id);\n      // we need a new div element because we have to handle\n      // the mouseover output separately\n      // debugger;\n      function addElement () {\n      // generate new div Element\n      var newDiv = $(document.createElement('div'));\n      // append at end of leaflet htmlwidget container\n      $(el).append(newDiv);\n      //provide ID and style\n      newDiv.addClass('lnlt');\n      newDiv.css({\n      'position': 'relative',\n      'bottomleft':  '0px',\n      'background-color': 'rgba(255, 255, 255, 0.7)',\n      'box-shadow': '0 0 2px #bbb',\n      'background-clip': 'padding-box',\n      'margin': '0',\n      'padding-left': '5px',\n      'color': '#333',\n      'font': '9px/1.5 \"Helvetica Neue\", Arial, Helvetica, sans-serif',\n      'z-index': '700',\n      });\n      return newDiv;\n      }\n\n\n      // check for already existing lnlt class to not duplicate\n      var lnlt = $(el).find('.lnlt');\n\n      if(!lnlt.length) {\n      lnlt = addElement();\n\n      // grab the special div we generated in the beginning\n      // and put the mousmove output there\n\n      map.on('mousemove', function (e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                           ' lon: ' + (e.latlng.lng).toFixed(5) +\n                           ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                           ' | zoom: ' + map.getZoom() +\n                           ' | x: ' + L.CRS.EPSG3857.project(e.latlng).x.toFixed(0) +\n                           ' | y: ' + L.CRS.EPSG3857.project(e.latlng).y.toFixed(0) +\n                           ' | epsg: 3857 ' +\n                           ' | proj4: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs ');\n      } else {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      }\n      });\n\n      // remove the lnlt div when mouse leaves map\n      map.on('mouseout', function (e) {\n      var strip = document.querySelector('.lnlt');\n      if( strip !==null) strip.remove();\n      });\n\n      };\n\n      //$(el).keypress(67, function(e) {\n      map.on('preclick', function(e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      var txt = document.querySelector('.lnlt').textContent;\n      console.log(txt);\n      //txt.innerText.focus();\n      //txt.select();\n      setClipboardText('\"' + txt + '\"');\n      }\n      });\n\n      }\n      ).call(this.getMap(), el, x, data);\n}","data":null},{"code":"function(el, x, data) {\n  return (function(el,x,data){\n           var map = this;\n\n           map.on('keypress', function(e) {\n               console.log(e.originalEvent.code);\n               var key = e.originalEvent.code;\n               if (key === 'KeyE') {\n                   var bb = this.getBounds();\n                   var txt = JSON.stringify(bb);\n                   console.log(txt);\n\n                   setClipboardText('\\'' + txt + '\\'');\n               }\n           })\n        }).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+</div>
+</div>
+</div>
+</section>
+<section id="area-of-interest-1" class="slide level2">
+<h2>Area of Interest</h2>
+<p>There are many other ways to specify areas of interest, including:</p>
+<p><strong>Points</strong></p>
+<div class="cell panel-fill columns column-output-location" data-layout-align="center">
+<div class="column">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>AOI<span class="sc">::</span><span class="fu">geocode</span>(</span>
+<span id="cb3-2"><a href="#cb3-2"></a>  <span class="st">'University of Nevada, Reno'</span>, </span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="at">pt =</span> <span class="cn">TRUE</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>  mapview<span class="sc">::</span><span class="fu">mapview</span>(<span class="at">label =</span> <span class="st">"request"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column">
+<div class="cell-output-display">
+
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-12ed232b7e152709d62c" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-12ed232b7e152709d62c">{"x":{"options":{"minZoom":1,"maxZoom":52,"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"preferCanvas":false,"bounceAtZoomLimits":false,"maxBounds":[[[-90,-370]],[[90,370]]]},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron","CartoDB.Positron","CartoDB.Positron",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatter","CartoDB.DarkMatter","CartoDB.DarkMatter",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap","OpenStreetMap","OpenStreetMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldImagery","Esri.WorldImagery","Esri.WorldImagery",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenTopoMap","OpenTopoMap","OpenTopoMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"createMapPane","args":["point",440]},{"method":"addCircleMarkers","args":[39.5442688,-119.816310515271,6,null,".",{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"pane":"point","stroke":true,"color":"#333333","weight":1,"opacity":0.9,"fill":true,"fillColor":"#6666FF","fillOpacity":0.6},null,null,"<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>1&emsp;<\/td><\/tr><tr><td>1<\/td><th>request&emsp;<\/th><td>University of Nevada, Reno&emsp;<\/td><\/tr><tr><td>2<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>",{"maxWidth":800,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"closeOnClick":true,"className":""},"University of Nevada, Reno",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]},{"method":"addHomeButton","args":[-119.816310515271,39.5442688,-119.816310515271,39.5442688,true,".","Zoom to .","<strong> . <\/strong>","bottomright"]},{"method":"addLayersControl","args":[["CartoDB.Positron","CartoDB.DarkMatter","OpenStreetMap","Esri.WorldImagery","OpenTopoMap"],".",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"addLegend","args":[{"colors":["#6666FF"],"labels":["University of Nevada, Reno"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"","extra":null,"layerId":null,"className":"info legend","group":"."}]}],"limits":{"lat":[39.5442688,39.5442688],"lng":[-119.816310515271,-119.816310515271]},"setView":[[39.5442688,-119.816310515271],18,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n      function(el, x, data) {\n      // get the leaflet map\n      var map = this; //HTMLWidgets.find('#' + el.id);\n      // we need a new div element because we have to handle\n      // the mouseover output separately\n      // debugger;\n      function addElement () {\n      // generate new div Element\n      var newDiv = $(document.createElement('div'));\n      // append at end of leaflet htmlwidget container\n      $(el).append(newDiv);\n      //provide ID and style\n      newDiv.addClass('lnlt');\n      newDiv.css({\n      'position': 'relative',\n      'bottomleft':  '0px',\n      'background-color': 'rgba(255, 255, 255, 0.7)',\n      'box-shadow': '0 0 2px #bbb',\n      'background-clip': 'padding-box',\n      'margin': '0',\n      'padding-left': '5px',\n      'color': '#333',\n      'font': '9px/1.5 \"Helvetica Neue\", Arial, Helvetica, sans-serif',\n      'z-index': '700',\n      });\n      return newDiv;\n      }\n\n\n      // check for already existing lnlt class to not duplicate\n      var lnlt = $(el).find('.lnlt');\n\n      if(!lnlt.length) {\n      lnlt = addElement();\n\n      // grab the special div we generated in the beginning\n      // and put the mousmove output there\n\n      map.on('mousemove', function (e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                           ' lon: ' + (e.latlng.lng).toFixed(5) +\n                           ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                           ' | zoom: ' + map.getZoom() +\n                           ' | x: ' + L.CRS.EPSG3857.project(e.latlng).x.toFixed(0) +\n                           ' | y: ' + L.CRS.EPSG3857.project(e.latlng).y.toFixed(0) +\n                           ' | epsg: 3857 ' +\n                           ' | proj4: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs ');\n      } else {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      }\n      });\n\n      // remove the lnlt div when mouse leaves map\n      map.on('mouseout', function (e) {\n      var strip = document.querySelector('.lnlt');\n      if( strip !==null) strip.remove();\n      });\n\n      };\n\n      //$(el).keypress(67, function(e) {\n      map.on('preclick', function(e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      var txt = document.querySelector('.lnlt').textContent;\n      console.log(txt);\n      //txt.innerText.focus();\n      //txt.select();\n      setClipboardText('\"' + txt + '\"');\n      }\n      });\n\n      }\n      ).call(this.getMap(), el, x, data);\n}","data":null},{"code":"function(el, x, data) {\n  return (function(el,x,data){\n           var map = this;\n\n           map.on('keypress', function(e) {\n               console.log(e.originalEvent.code);\n               var key = e.originalEvent.code;\n               if (key === 'KeyE') {\n                   var bb = this.getBounds();\n                   var txt = JSON.stringify(bb);\n                   console.log(txt);\n\n                   setClipboardText('\\'' + txt + '\\'');\n               }\n           })\n        }).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+</div>
+</div>
+</div>
+</section>
+<section id="area-of-interest-2" class="slide level2">
+<h2>Area of Interest</h2>
+<p>There are many other ways to specify areas of interest, including:</p>
+<p><strong>Addresses</strong></p>
+<div class="cell panel-fill columns column-output-location" data-layout-align="center">
+<div class="column">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>AOI<span class="sc">::</span><span class="fu">geocode</span>(</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="st">'2215 Raggio Parkway, Reno, NV 89512'</span>, </span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="at">pt =</span> <span class="cn">TRUE</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>  mapview<span class="sc">::</span><span class="fu">mapview</span>(<span class="at">label =</span> <span class="st">"request"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column">
+<div class="cell-output-display">
+
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-32aa98d1a0de8f08c3e9" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-32aa98d1a0de8f08c3e9">{"x":{"options":{"minZoom":1,"maxZoom":52,"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"preferCanvas":false,"bounceAtZoomLimits":false,"maxBounds":[[[-90,-370]],[[90,370]]]},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron","CartoDB.Positron","CartoDB.Positron",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatter","CartoDB.DarkMatter","CartoDB.DarkMatter",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap","OpenStreetMap","OpenStreetMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldImagery","Esri.WorldImagery","Esri.WorldImagery",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenTopoMap","OpenTopoMap","OpenTopoMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"createMapPane","args":["point",440]},{"method":"addCircleMarkers","args":[39.5721913,-119.7925536,6,null,".",{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"pane":"point","stroke":true,"color":"#333333","weight":1,"opacity":0.9,"fill":true,"fillColor":"#6666FF","fillOpacity":0.6},null,null,"<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>1&emsp;<\/td><\/tr><tr><td>1<\/td><th>request&emsp;<\/th><td>2215 Raggio Parkway, Reno, NV 89512&emsp;<\/td><\/tr><tr><td>2<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>",{"maxWidth":800,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"closeOnClick":true,"className":""},"2215 Raggio Parkway, Reno, NV 89512",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]},{"method":"addHomeButton","args":[-119.7925536,39.5721913,-119.7925536,39.5721913,true,".","Zoom to .","<strong> . <\/strong>","bottomright"]},{"method":"addLayersControl","args":[["CartoDB.Positron","CartoDB.DarkMatter","OpenStreetMap","Esri.WorldImagery","OpenTopoMap"],".",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"addLegend","args":[{"colors":["#6666FF"],"labels":["2215 Raggio Parkway, Reno, NV 89512"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"","extra":null,"layerId":null,"className":"info legend","group":"."}]}],"limits":{"lat":[39.5721913,39.5721913],"lng":[-119.7925536,-119.7925536]},"setView":[[39.5721913,-119.7925536],18,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n      function(el, x, data) {\n      // get the leaflet map\n      var map = this; //HTMLWidgets.find('#' + el.id);\n      // we need a new div element because we have to handle\n      // the mouseover output separately\n      // debugger;\n      function addElement () {\n      // generate new div Element\n      var newDiv = $(document.createElement('div'));\n      // append at end of leaflet htmlwidget container\n      $(el).append(newDiv);\n      //provide ID and style\n      newDiv.addClass('lnlt');\n      newDiv.css({\n      'position': 'relative',\n      'bottomleft':  '0px',\n      'background-color': 'rgba(255, 255, 255, 0.7)',\n      'box-shadow': '0 0 2px #bbb',\n      'background-clip': 'padding-box',\n      'margin': '0',\n      'padding-left': '5px',\n      'color': '#333',\n      'font': '9px/1.5 \"Helvetica Neue\", Arial, Helvetica, sans-serif',\n      'z-index': '700',\n      });\n      return newDiv;\n      }\n\n\n      // check for already existing lnlt class to not duplicate\n      var lnlt = $(el).find('.lnlt');\n\n      if(!lnlt.length) {\n      lnlt = addElement();\n\n      // grab the special div we generated in the beginning\n      // and put the mousmove output there\n\n      map.on('mousemove', function (e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                           ' lon: ' + (e.latlng.lng).toFixed(5) +\n                           ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                           ' | zoom: ' + map.getZoom() +\n                           ' | x: ' + L.CRS.EPSG3857.project(e.latlng).x.toFixed(0) +\n                           ' | y: ' + L.CRS.EPSG3857.project(e.latlng).y.toFixed(0) +\n                           ' | epsg: 3857 ' +\n                           ' | proj4: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs ');\n      } else {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      }\n      });\n\n      // remove the lnlt div when mouse leaves map\n      map.on('mouseout', function (e) {\n      var strip = document.querySelector('.lnlt');\n      if( strip !==null) strip.remove();\n      });\n\n      };\n\n      //$(el).keypress(67, function(e) {\n      map.on('preclick', function(e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      var txt = document.querySelector('.lnlt').textContent;\n      console.log(txt);\n      //txt.innerText.focus();\n      //txt.select();\n      setClipboardText('\"' + txt + '\"');\n      }\n      });\n\n      }\n      ).call(this.getMap(), el, x, data);\n}","data":null},{"code":"function(el, x, data) {\n  return (function(el,x,data){\n           var map = this;\n\n           map.on('keypress', function(e) {\n               console.log(e.originalEvent.code);\n               var key = e.originalEvent.code;\n               if (key === 'KeyE') {\n                   var bb = this.getBounds();\n                   var txt = JSON.stringify(bb);\n                   console.log(txt);\n\n                   setClipboardText('\\'' + txt + '\\'');\n               }\n           })\n        }).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+</div>
+</div>
+</div>
+</section>
+<section id="area-of-interest-3" class="slide level2">
+<h2>Area of Interest</h2>
+<p>There are many other ways to specify areas of interest, including:</p>
+<p><strong>Bounding Boxes</strong></p>
+<div class="cell panel-fill columns column-output-location" data-layout-align="center">
+<div class="column">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>AOI<span class="sc">::</span><span class="fu">geocode</span>(</span>
+<span id="cb5-2"><a href="#cb5-2"></a>  <span class="st">"Washoe County, NV"</span>,</span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="at">bb =</span> <span class="cn">TRUE</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>  mapview<span class="sc">::</span><span class="fu">mapview</span>(<span class="at">label =</span> <span class="st">"request"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column">
+<div class="cell-output-display">
+
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-2c6a70493d861bdf666f" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-2c6a70493d861bdf666f">{"x":{"options":{"minZoom":1,"maxZoom":52,"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"preferCanvas":false,"bounceAtZoomLimits":false,"maxBounds":[[[-90,-370]],[[90,370]]]},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron","CartoDB.Positron","CartoDB.Positron",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatter","CartoDB.DarkMatter","CartoDB.DarkMatter",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap","OpenStreetMap","OpenStreetMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldImagery","Esri.WorldImagery","Esri.WorldImagery",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenTopoMap","OpenTopoMap","OpenTopoMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"createMapPane","args":["polygon",420]},{"method":"addPolygons","args":[[[[{"lng":[-120.0057276,-119.170544,-119.170544,-120.0057276,-120.0057276],"lat":[39.1654387,39.1654387,41.997641,41.997641,39.1654387]}]]],null,".",{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"pane":"polygon","stroke":true,"color":"#333333","weight":0.5,"opacity":0.9,"fill":true,"fillColor":"#6666FF","fillOpacity":0.6,"smoothFactor":1,"noClip":false},"<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>1&emsp;<\/td><\/tr><tr><td>1<\/td><th>geometry&emsp;<\/th><td>sfc_POLYGON&emsp;<\/td><\/tr><tr><td>2<\/td><th>request&emsp;<\/th><td>Washoe County, NV&emsp;<\/td><\/tr><\/table><\/div>",{"maxWidth":800,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"closeOnClick":true,"className":""},"Washoe County, NV",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},{"stroke":true,"weight":1,"opacity":0.9,"fillOpacity":0.84,"bringToFront":false,"sendToBack":false}]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]},{"method":"addHomeButton","args":[-120.0057276,39.1654387,-119.170544,41.997641,true,".","Zoom to .","<strong> . <\/strong>","bottomright"]},{"method":"addLayersControl","args":[["CartoDB.Positron","CartoDB.DarkMatter","OpenStreetMap","Esri.WorldImagery","OpenTopoMap"],".",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"addLegend","args":[{"colors":["#6666FF"],"labels":["Washoe County, NV"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"","extra":null,"layerId":null,"className":"info legend","group":"."}]}],"limits":{"lat":[39.1654387,41.997641],"lng":[-120.0057276,-119.170544]},"fitBounds":[39.1654387,-120.0057276,41.997641,-119.170544,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n      function(el, x, data) {\n      // get the leaflet map\n      var map = this; //HTMLWidgets.find('#' + el.id);\n      // we need a new div element because we have to handle\n      // the mouseover output separately\n      // debugger;\n      function addElement () {\n      // generate new div Element\n      var newDiv = $(document.createElement('div'));\n      // append at end of leaflet htmlwidget container\n      $(el).append(newDiv);\n      //provide ID and style\n      newDiv.addClass('lnlt');\n      newDiv.css({\n      'position': 'relative',\n      'bottomleft':  '0px',\n      'background-color': 'rgba(255, 255, 255, 0.7)',\n      'box-shadow': '0 0 2px #bbb',\n      'background-clip': 'padding-box',\n      'margin': '0',\n      'padding-left': '5px',\n      'color': '#333',\n      'font': '9px/1.5 \"Helvetica Neue\", Arial, Helvetica, sans-serif',\n      'z-index': '700',\n      });\n      return newDiv;\n      }\n\n\n      // check for already existing lnlt class to not duplicate\n      var lnlt = $(el).find('.lnlt');\n\n      if(!lnlt.length) {\n      lnlt = addElement();\n\n      // grab the special div we generated in the beginning\n      // and put the mousmove output there\n\n      map.on('mousemove', function (e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                           ' lon: ' + (e.latlng.lng).toFixed(5) +\n                           ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                           ' | zoom: ' + map.getZoom() +\n                           ' | x: ' + L.CRS.EPSG3857.project(e.latlng).x.toFixed(0) +\n                           ' | y: ' + L.CRS.EPSG3857.project(e.latlng).y.toFixed(0) +\n                           ' | epsg: 3857 ' +\n                           ' | proj4: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs ');\n      } else {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      }\n      });\n\n      // remove the lnlt div when mouse leaves map\n      map.on('mouseout', function (e) {\n      var strip = document.querySelector('.lnlt');\n      if( strip !==null) strip.remove();\n      });\n\n      };\n\n      //$(el).keypress(67, function(e) {\n      map.on('preclick', function(e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      var txt = document.querySelector('.lnlt').textContent;\n      console.log(txt);\n      //txt.innerText.focus();\n      //txt.select();\n      setClipboardText('\"' + txt + '\"');\n      }\n      });\n\n      }\n      ).call(this.getMap(), el, x, data);\n}","data":null},{"code":"function(el, x, data) {\n  return (function(el,x,data){\n           var map = this;\n\n           map.on('keypress', function(e) {\n               console.log(e.originalEvent.code);\n               var key = e.originalEvent.code;\n               if (key === 'KeyE') {\n                   var bb = this.getBounds();\n                   var txt = JSON.stringify(bb);\n                   console.log(txt);\n\n                   setClipboardText('\\'' + txt + '\\'');\n               }\n           })\n        }).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+</div>
+</div>
+</div>
+</section>
+<section id="weather-data-with-rnoaa" class="slide level2">
+<h2>Weather data with <code>rnoaa</code></h2>
+<p><code>rnoaa</code> is an interface to many NOAA datasets, including the Global Historical Climatology Dataset of daily weather station summaries.</p>
+<p>Data sources include:</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><a href="https://www.ncdc.noaa.gov/cdo-web/webservices/v2">NOAA NCDC climate</a></li>
+<li><a href="https://www.ncdc.noaa.gov/swdiws/">Severe weather</a></li>
+<li><a href="ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/shapefiles">Sea ice</a></li>
+<li><a href="https://www.ndbc.noaa.gov/">NOAA buoy</a></li>
+<li><a href="https://upwell.pfeg.noaa.gov/erddap/index.html">ERDDAP</a></li>
+<li><a href="https://www.spc.noaa.gov/gis/svrgis/">Tornadoes from the NOAA Storm Prediction Center</a></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li><a href="http://www.ncdc.noaa.gov/homr/api">Historical Observing Metadata Repository (HOMR)</a></li>
+<li><a href="https://www.ncdc.noaa.gov/data-access/marineocean-data/extended-reconstructed-sea-surface-temperature-ersst-v4">Extended Reconstructed Sea Surface Temperature (ERSST)</a></li>
+<li><a href="http://www.argo.ucsd.edu/">Argo buoys</a></li>
+<li><a href="https://tidesandcurrents.noaa.gov/">CO-OPS tides and currents data</a></li>
+<li><a href="http://www.cpc.ncep.noaa.gov/">Climate Prediction Center (CPC)</a></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="weather-data-with-rnoaa-1" class="slide level2">
+<h2>Weather data with <code>rnoaa</code></h2>
+<p>We are going to focus on GHCN daily data. This analysis comes from the <a href="https://native-climate.com">Native Climate project</a>, where reporting intern Robin Smuda requested data on <a href="https://native-climate.com/2022/09/restoring-our-relationship-with-himu-willow-requires-human-interaction-rather-than-protection/">changing willow harvest timing</a> on the Washoe Reservation.</p>
+<p>Coyote Willow, or <em>hímu</em> in the Washoe language, is essential for traditional Washoe basket weaving. Willow needs to be harvested prior to flowering but after the spring thaw in order to be workable for weaving, usually during the first week of above-freezing weather. Washoe artisans had noted to Robin that the timing of that critical period has been changing.</p>
+<p>Specifically, Robin wanted to know when the first warm spell (at least 7 consecutive days where the minimum daily temperature rose above 28 ºF, after March 1) has occurred in each year since 1950.</p>
+</section>
+<section id="weather-data-with-rnoaa-2" class="slide level2">
+<h2>Weather data with <code>rnoaa</code></h2>
+<p>Native Climate intern Paige Johnson decided to use daily data from the GHCN to perform the analysis. First she needed to <strong>identify a nearby GHCN station</strong> to use in the analysis.</p>
+<p>Here, we use the <code>rnoaa::ghcnd_stations()</code> function to retrieve a catalog of GHCN stations, and identify candidate stations within Douglas County, NV.</p>
+<div class="cell panel-fill columns column-output-location" data-layout-align="center">
+<div class="column">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Get the boundary for Douglas County, NV</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>douglas <span class="ot">&lt;-</span> </span>
+<span id="cb6-3"><a href="#cb6-3"></a>  AOI<span class="sc">::</span><span class="fu">aoi_get</span>(</span>
+<span id="cb6-4"><a href="#cb6-4"></a>    <span class="at">state =</span> <span class="st">"NV"</span>, </span>
+<span id="cb6-5"><a href="#cb6-5"></a>    <span class="at">county =</span> <span class="st">"Douglas"</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>  )</span>
+<span id="cb6-7"><a href="#cb6-7"></a></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co"># Get the GHCN station inventory</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>douglas_stations <span class="ot">&lt;-</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a>  rnoaa<span class="sc">::</span><span class="fu">ghcnd_stations</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a>  <span class="co"># Filter for stations that report minimum temperature</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(element <span class="sc">==</span> <span class="st">"TMIN"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a>  <span class="co"># Convert into a spatial object</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a>  sf<span class="sc">::</span><span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>),</span>
+<span id="cb6-15"><a href="#cb6-15"></a>               <span class="at">crs =</span> <span class="st">"WGS84"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a>  <span class="co"># Find stations within Douglas County</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a>  sf<span class="sc">::</span><span class="fu">st_intersection</span>(douglas)</span>
+<span id="cb6-18"><a href="#cb6-18"></a></span>
+<span id="cb6-19"><a href="#cb6-19"></a>mapview<span class="sc">::</span><span class="fu">mapview</span>(douglas_stations,</span>
+<span id="cb6-20"><a href="#cb6-20"></a>                 <span class="at">label =</span> <span class="st">"name"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column">
+<div class="cell-output-display">
+
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-2d6fcd56d77f0ce6ef17" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-2d6fcd56d77f0ce6ef17">{"x":{"options":{"minZoom":1,"maxZoom":52,"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"preferCanvas":false,"bounceAtZoomLimits":false,"maxBounds":[[[-90,-370]],[[90,370]]]},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron","CartoDB.Positron","CartoDB.Positron",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatter","CartoDB.DarkMatter","CartoDB.DarkMatter",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap","OpenStreetMap","OpenStreetMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldImagery","Esri.WorldImagery","Esri.WorldImagery",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenTopoMap","OpenTopoMap","OpenTopoMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"createMapPane","args":["point",440]},{"method":"addCircleMarkers","args":[[38.9783,38.9667,39,39.0753,38.9833,38.9547,39.02,39.0833,39.1,38.9667,38.7394,38.7456,38.9361],[-119.8914,-119.95,-119.85,-119.9411,-119.75,-119.7758,-119.7089,-119.6333,-119.9167,-119.95,-119.5181,-119.51,-119.6519],6,null,"douglas_stations",{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"pane":"point","stroke":true,"color":"#333333","weight":1,"opacity":0.9,"fill":true,"fillColor":"#6666FF","fillOpacity":0.6},null,null,["<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>1&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00262119&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>2235.4&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>DAGGET PASS&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1988&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>2022&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>2&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00262510&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>1920.2&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>EDGEWOOD&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1893&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>1895&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>3&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00263040&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>1463.0&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>GENOA&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1888&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>1897&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>4&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00263205&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>1935.5&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>GLENBROOK&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1909&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>2020&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>5&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00264864&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>1472.2&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>MARTIN'S RANCH&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1897&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>1906&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>6&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00265191&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>1435.3&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>MINDEN&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1906&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>2022&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>7&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00265194&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>1487.4&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>MINDEN 6 NE&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>2009&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>2019&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>8&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00266330&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>2130.6&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>POTTS&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1892&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>1919&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>9&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00267710&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>2144.0&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>SPOONERS STN&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1909&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>1946&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>10&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00267806&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>1904.4&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>STATELINE-HARRAH'S&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1984&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>1998&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>11&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00268186&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>1613.0&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>TOPAZ LAKE&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1957&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>2022&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>12&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USC00268202&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>1699.9&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>TOPAZ LAKE 4 N&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1986&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>2000&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>13&emsp;<\/td><\/tr><tr><td>1<\/td><th>id&emsp;<\/th><td>USR0000NFIS&emsp;<\/td><\/tr><tr><td>2<\/td><th>elevation&emsp;<\/th><td>1560.6&emsp;<\/td><\/tr><tr><td>3<\/td><th>state&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>name&emsp;<\/th><td>FISH SPRINGS NEVADA&emsp;<\/td><\/tr><tr><td>5<\/td><th>gsn_flag&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>6<\/td><th>wmo_id&emsp;<\/th><td>&emsp;<\/td><\/tr><tr><td>7<\/td><th>element&emsp;<\/th><td>TMIN&emsp;<\/td><\/tr><tr><td>8<\/td><th>first_year&emsp;<\/th><td>1986&emsp;<\/td><\/tr><tr><td>9<\/td><th>last_year&emsp;<\/th><td>2021&emsp;<\/td><\/tr><tr><td>10<\/td><th>state_region&emsp;<\/th><td>4&emsp;<\/td><\/tr><tr><td>11<\/td><th>state_division&emsp;<\/th><td>8&emsp;<\/td><\/tr><tr><td>12<\/td><th>feature_code&emsp;<\/th><td>0858643&emsp;<\/td><\/tr><tr><td>13<\/td><th>state_name&emsp;<\/th><td>Nevada&emsp;<\/td><\/tr><tr><td>14<\/td><th>state_abbr&emsp;<\/th><td>NV&emsp;<\/td><\/tr><tr><td>15<\/td><th>name.1&emsp;<\/th><td>Douglas&emsp;<\/td><\/tr><tr><td>16<\/td><th>fip_class&emsp;<\/th><td>H1&emsp;<\/td><\/tr><tr><td>17<\/td><th>tiger_class&emsp;<\/th><td>G4020&emsp;<\/td><\/tr><tr><td>18<\/td><th>combined_area_code&emsp;<\/th><td>456&emsp;<\/td><\/tr><tr><td>19<\/td><th>metropolitan_area_code&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>20<\/td><th>functional_status&emsp;<\/th><td>A&emsp;<\/td><\/tr><tr><td>21<\/td><th>land_area&emsp;<\/th><td>1840147662&emsp;<\/td><\/tr><tr><td>22<\/td><th>water_area&emsp;<\/th><td>72317573&emsp;<\/td><\/tr><tr><td>23<\/td><th>fip_code&emsp;<\/th><td>32005&emsp;<\/td><\/tr><tr><td>24<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>"],{"maxWidth":800,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"closeOnClick":true,"className":""},["DAGGET PASS","EDGEWOOD","GENOA","GLENBROOK","MARTIN'S RANCH","MINDEN","MINDEN 6 NE","POTTS","SPOONERS STN","STATELINE-HARRAH'S","TOPAZ LAKE","TOPAZ LAKE 4 N","FISH SPRINGS NEVADA"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]},{"method":"addHomeButton","args":[-119.95,38.7394,-119.51,39.1,true,"douglas_stations","Zoom to douglas_stations","<strong> douglas_stations <\/strong>","bottomright"]},{"method":"addLayersControl","args":[["CartoDB.Positron","CartoDB.DarkMatter","OpenStreetMap","Esri.WorldImagery","OpenTopoMap"],"douglas_stations",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"addLegend","args":[{"colors":["#6666FF"],"labels":["douglas_stations"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"","extra":null,"layerId":null,"className":"info legend","group":"douglas_stations"}]}],"limits":{"lat":[38.7394,39.1],"lng":[-119.95,-119.51]},"fitBounds":[38.7394,-119.95,39.1,-119.51,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n      function(el, x, data) {\n      // get the leaflet map\n      var map = this; //HTMLWidgets.find('#' + el.id);\n      // we need a new div element because we have to handle\n      // the mouseover output separately\n      // debugger;\n      function addElement () {\n      // generate new div Element\n      var newDiv = $(document.createElement('div'));\n      // append at end of leaflet htmlwidget container\n      $(el).append(newDiv);\n      //provide ID and style\n      newDiv.addClass('lnlt');\n      newDiv.css({\n      'position': 'relative',\n      'bottomleft':  '0px',\n      'background-color': 'rgba(255, 255, 255, 0.7)',\n      'box-shadow': '0 0 2px #bbb',\n      'background-clip': 'padding-box',\n      'margin': '0',\n      'padding-left': '5px',\n      'color': '#333',\n      'font': '9px/1.5 \"Helvetica Neue\", Arial, Helvetica, sans-serif',\n      'z-index': '700',\n      });\n      return newDiv;\n      }\n\n\n      // check for already existing lnlt class to not duplicate\n      var lnlt = $(el).find('.lnlt');\n\n      if(!lnlt.length) {\n      lnlt = addElement();\n\n      // grab the special div we generated in the beginning\n      // and put the mousmove output there\n\n      map.on('mousemove', function (e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                           ' lon: ' + (e.latlng.lng).toFixed(5) +\n                           ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                           ' | zoom: ' + map.getZoom() +\n                           ' | x: ' + L.CRS.EPSG3857.project(e.latlng).x.toFixed(0) +\n                           ' | y: ' + L.CRS.EPSG3857.project(e.latlng).y.toFixed(0) +\n                           ' | epsg: 3857 ' +\n                           ' | proj4: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs ');\n      } else {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      }\n      });\n\n      // remove the lnlt div when mouse leaves map\n      map.on('mouseout', function (e) {\n      var strip = document.querySelector('.lnlt');\n      if( strip !==null) strip.remove();\n      });\n\n      };\n\n      //$(el).keypress(67, function(e) {\n      map.on('preclick', function(e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      var txt = document.querySelector('.lnlt').textContent;\n      console.log(txt);\n      //txt.innerText.focus();\n      //txt.select();\n      setClipboardText('\"' + txt + '\"');\n      }\n      });\n\n      }\n      ).call(this.getMap(), el, x, data);\n}","data":null},{"code":"function(el, x, data) {\n  return (function(el,x,data){\n           var map = this;\n\n           map.on('keypress', function(e) {\n               console.log(e.originalEvent.code);\n               var key = e.originalEvent.code;\n               if (key === 'KeyE') {\n                   var bb = this.getBounds();\n                   var txt = JSON.stringify(bb);\n                   console.log(txt);\n\n                   setClipboardText('\\'' + txt + '\\'');\n               }\n           })\n        }).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+</div>
+</div>
+</div>
+</section>
+<section id="weather-data-with-rnoaa-3" class="slide level2">
+<h2>Weather data with <code>rnoaa</code></h2>
+<p>We decided to use the station from Minden, NV, which had a long, relatively complete record and was within the Washoe Reservation. We use the <code>rnoaa::meteo_tidy_ghcnd()</code> function, which cleans the GHCN data into a tidy format.</p>
+<div class="cell panel-fill columns column-output-location" data-layout-align="center">
+<div class="column">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Get the daily temperature data for Minden, NV</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>ghcn_minden <span class="ot">&lt;-</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>  rnoaa<span class="sc">::</span><span class="fu">meteo_tidy_ghcnd</span>(<span class="st">"USC00265191"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4"></a>                          <span class="at">var =</span> <span class="st">"tmin"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>  <span class="co"># add missing days to the dataset</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>  dplyr<span class="sc">::</span><span class="fu">full_join</span>(.,</span>
+<span id="cb7-7"><a href="#cb7-7"></a>                   tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="at">date =</span> <span class="fu">seq</span>(<span class="fu">min</span>(.<span class="sc">$</span>date), </span>
+<span id="cb7-8"><a href="#cb7-8"></a>                                             <span class="fu">max</span>(.<span class="sc">$</span>date),</span>
+<span id="cb7-9"><a href="#cb7-9"></a>                                             <span class="st">"1 day"</span>)),</span>
+<span id="cb7-10"><a href="#cb7-10"></a>                   <span class="at">by =</span> <span class="st">"date"</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a>  <span class="co"># Make sure the table is sorted by date</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(date) <span class="sc">%&gt;%</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a>  <span class="co"># "mutate" performs operations on variables, </span></span>
+<span id="cb7-15"><a href="#cb7-15"></a>  <span class="co"># and creates new ones</span></span>
+<span id="cb7-16"><a href="#cb7-16"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb7-17"><a href="#cb7-17"></a>    <span class="co"># tmin in GHCN are in tenths of ºC</span></span>
+<span id="cb7-18"><a href="#cb7-18"></a>    <span class="co"># Set units, then convert to degrees F</span></span>
+<span id="cb7-19"><a href="#cb7-19"></a>    <span class="at">tmin =</span> </span>
+<span id="cb7-20"><a href="#cb7-20"></a>      units<span class="sc">::</span><span class="fu">set_units</span>(tmin <span class="sc">/</span> <span class="dv">10</span>, <span class="st">"deg_C"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-21"><a href="#cb7-21"></a>      units<span class="sc">::</span><span class="fu">set_units</span>(<span class="st">"deg_F"</span>),</span>
+<span id="cb7-22"><a href="#cb7-22"></a>    <span class="co"># Identify days where the minimum temperature is &gt; 28ºF</span></span>
+<span id="cb7-23"><a href="#cb7-23"></a>    <span class="st">`</span><span class="at">&gt; 28F</span><span class="st">`</span> <span class="ot">=</span> tmin <span class="sc">&gt;</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">28</span>, <span class="st">"deg_F"</span>),</span>
+<span id="cb7-24"><a href="#cb7-24"></a>    <span class="co"># disqualify missing data </span></span>
+<span id="cb7-25"><a href="#cb7-25"></a>    <span class="st">`</span><span class="at">&gt; 28F</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(<span class="st">`</span><span class="at">&gt; 28F</span><span class="st">`</span>), <span class="cn">FALSE</span>, <span class="st">`</span><span class="at">&gt; 28F</span><span class="st">`</span>)</span>
+<span id="cb7-26"><a href="#cb7-26"></a>  )</span>
+<span id="cb7-27"><a href="#cb7-27"></a></span>
+<span id="cb7-28"><a href="#cb7-28"></a>ghcn_minden <span class="sc">%&gt;%</span></span>
+<span id="cb7-29"><a href="#cb7-29"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(date, tmin, <span class="st">`</span><span class="at">&gt; 28F</span><span class="st">`</span></span>
+<span id="cb7-30"><a href="#cb7-30"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb7-31"><a href="#cb7-31"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(date <span class="sc">&gt;=</span> <span class="st">"1950-03-01"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-32"><a href="#cb7-32"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-33"><a href="#cb7-33"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column">
+<div class="cell-output-display">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">date</th>
+<th style="text-align: right;">tmin</th>
+<th style="text-align: left;">&gt; 28F</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1950-03-01</td>
+<td style="text-align: right;">19.94 [deg_F]</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1950-03-02</td>
+<td style="text-align: right;">24.08 [deg_F]</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1950-03-03</td>
+<td style="text-align: right;">21.92 [deg_F]</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1950-03-04</td>
+<td style="text-align: right;">26.96 [deg_F]</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1950-03-05</td>
+<td style="text-align: right;">37.04 [deg_F]</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1950-03-06</td>
+<td style="text-align: right;">21.92 [deg_F]</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1950-03-07</td>
+<td style="text-align: right;">14.00 [deg_F]</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1950-03-08</td>
+<td style="text-align: right;">24.08 [deg_F]</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1950-03-09</td>
+<td style="text-align: right;">21.92 [deg_F]</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1950-03-10</td>
+<td style="text-align: right;">17.96 [deg_F]</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="weather-data-with-rnoaa-4" class="slide level2">
+<h2>Weather data with <code>rnoaa</code></h2>
+<p>Now that we have the data in shape, it is time to identify the warm spells. Here, we develop an algorithm to do so (you can peruse the comments later) and then plot the data from 1950 to today.</p>
+<div class="cell columns column-output-location" data-layout-align="center">
+<div class="column">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>ghcn_minden_warm_spells <span class="ot">&lt;-</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>  ghcn_minden <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a>  <span class="co"># Calculate Warm Spell Start as the first day with a TMIN greater than 28F</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>  <span class="co"># Calculate Warm Spell End as the last consecutive day with TMIN greater than 28F</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.logical</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">diff</span>(<span class="st">`</span><span class="at">&gt; 28F</span><span class="st">`</span>) <span class="sc">==</span> <span class="dv">1</span>)),</span>
+<span id="cb8-6"><a href="#cb8-6"></a>                <span class="st">`</span><span class="at">Warm Spell End</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">diff</span>(<span class="st">`</span><span class="at">&gt; 28F</span><span class="st">`</span>), <span class="sc">-</span><span class="dv">1</span>) <span class="sc">==</span> <span class="sc">-</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a>  <span class="co"># Make a subset of data for Warm Spell Start and Warm Spell End</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span> <span class="sc">|</span> <span class="st">`</span><span class="at">Warm Spell End</span><span class="st">`</span>) <span class="sc">%$%</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a>  <span class="co"># Create a new dataset that includes Warm Spell Start and End dates</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a>  tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span> <span class="ot">=</span> date[<span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span>],</span>
+<span id="cb8-11"><a href="#cb8-11"></a>                 <span class="st">`</span><span class="at">Warm Spell End</span><span class="st">`</span> <span class="ot">=</span> date[<span class="st">`</span><span class="at">Warm Spell End</span><span class="st">`</span>][<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span>)]) <span class="sc">%&gt;%</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a>  <span class="co"># Show year and day of year for the Warm Spell Start</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a>  <span class="co"># Show day of year for Warm Spell End </span></span>
+<span id="cb8-14"><a href="#cb8-14"></a>  <span class="co"># Determine the number of days between Warm Spell Start and Warm Spell End</span></span>
+<span id="cb8-15"><a href="#cb8-15"></a>  <span class="co"># Add 1 to this value to get the correct number</span></span>
+<span id="cb8-16"><a href="#cb8-16"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="st">`</span><span class="at">Warm Spell Start Year</span><span class="st">`</span> <span class="ot">=</span> lubridate<span class="sc">::</span><span class="fu">year</span>(<span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span>),</span>
+<span id="cb8-17"><a href="#cb8-17"></a>                <span class="st">`</span><span class="at">Warm Spell Start DOY</span><span class="st">`</span> <span class="ot">=</span> lubridate<span class="sc">::</span><span class="fu">yday</span>(<span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span>),</span>
+<span id="cb8-18"><a href="#cb8-18"></a>                <span class="st">`</span><span class="at">Warm Spell End DOY</span><span class="st">`</span> <span class="ot">=</span> lubridate<span class="sc">::</span><span class="fu">yday</span>(<span class="st">`</span><span class="at">Warm Spell End</span><span class="st">`</span>),</span>
+<span id="cb8-19"><a href="#cb8-19"></a>                <span class="at">Length =</span> (<span class="st">`</span><span class="at">Warm Spell End</span><span class="st">`</span> <span class="sc">-</span> <span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span>) <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-20"><a href="#cb8-20"></a>  </span>
+<span id="cb8-21"><a href="#cb8-21"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
+<span id="cb8-22"><a href="#cb8-22"></a>    <span class="co"># Get periods of longer than a week</span></span>
+<span id="cb8-23"><a href="#cb8-23"></a>    Length <span class="sc">&gt;=</span> <span class="dv">7</span>,</span>
+<span id="cb8-24"><a href="#cb8-24"></a>    <span class="co"># That occur after March 1</span></span>
+<span id="cb8-25"><a href="#cb8-25"></a>    lubridate<span class="sc">::</span><span class="fu">month</span>(<span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span>) <span class="sc">&gt;=</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-26"><a href="#cb8-26"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(<span class="st">`</span><span class="at">Warm Spell Start Year</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-27"><a href="#cb8-27"></a>  <span class="co"># Get the first warm spell of each year</span></span>
+<span id="cb8-28"><a href="#cb8-28"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span> <span class="sc">==</span> <span class="fu">min</span>(<span class="st">`</span><span class="at">Warm Spell Start</span><span class="st">`</span>))</span>
+<span id="cb8-29"><a href="#cb8-29"></a></span>
+<span id="cb8-30"><a href="#cb8-30"></a>ghcn_minden_warm_spells <span class="sc">%&gt;%</span></span>
+<span id="cb8-31"><a href="#cb8-31"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">Year =</span> <span class="st">`</span><span class="at">Warm Spell Start Year</span><span class="st">`</span>,</span>
+<span id="cb8-32"><a href="#cb8-32"></a>                <span class="st">`</span><span class="at">Start DOY</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Warm Spell Start DOY</span><span class="st">`</span>,</span>
+<span id="cb8-33"><a href="#cb8-33"></a>                <span class="st">`</span><span class="at">End DOY</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Warm Spell End DOY</span><span class="st">`</span>,</span>
+<span id="cb8-34"><a href="#cb8-34"></a>                <span class="at">Duration =</span> Length</span>
+<span id="cb8-35"><a href="#cb8-35"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb8-36"><a href="#cb8-36"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Year <span class="sc">&gt;=</span> <span class="dv">1950</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-37"><a href="#cb8-37"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-38"><a href="#cb8-38"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column">
+<div class="cell-output-display">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Year</th>
+<th style="text-align: right;">Start DOY</th>
+<th style="text-align: right;">End DOY</th>
+<th style="text-align: left;">Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1950</td>
+<td style="text-align: right;">106</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: left;">13 days</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1951</td>
+<td style="text-align: right;">103</td>
+<td style="text-align: right;">119</td>
+<td style="text-align: left;">17 days</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1952</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">124</td>
+<td style="text-align: left;">12 days</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1953</td>
+<td style="text-align: right;">109</td>
+<td style="text-align: right;">121</td>
+<td style="text-align: left;">13 days</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1954</td>
+<td style="text-align: right;">103</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: left;">18 days</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1955</td>
+<td style="text-align: right;">124</td>
+<td style="text-align: right;">144</td>
+<td style="text-align: left;">21 days</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1956</td>
+<td style="text-align: right;">101</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: left;">18 days</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1957</td>
+<td style="text-align: right;">124</td>
+<td style="text-align: right;">276</td>
+<td style="text-align: left;">153 days</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1958</td>
+<td style="text-align: right;">121</td>
+<td style="text-align: right;">266</td>
+<td style="text-align: left;">146 days</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1959</td>
+<td style="text-align: right;">125</td>
+<td style="text-align: right;">257</td>
+<td style="text-align: left;">133 days</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="weather-data-with-rnoaa-5" class="slide level2">
+<h2>Weather data with <code>rnoaa</code></h2>
+<p>Now that we have the data in shape, it is time to identify the warm spells. Here, we develop an algorithm to do so (you can peruse the comments later) and then plot the data from 1950 to today.</p>
+<div class="cell columns column-output-location" data-layout-align="center" data-fig.asp="0.8">
+<div class="column">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Find the slope of a linear model regressing the</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co"># start of the warm spells on the year.</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="co"># lm(`Warm Spell Start DOY` ~ `Warm Spell Start Year`,</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">#      data = ghcn_minden_warm_spells %&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co">#      dplyr::filter(`Warm Spell Start Year` &gt;= 1950)) %&gt;%</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="co">#   summary()</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co"># -0.35 days/year, 3.5 days/decade, or 1 week/20 years</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a></span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="co"># Create a plot that shows the start date of the warm spells</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co"># and a loess smooth of </span></span>
+<span id="cb9-11"><a href="#cb9-11"></a>ghcn_minden_warm_spells <span class="sc">%&gt;%</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Warm Spell Start Year</span><span class="st">`</span>,</span>
+<span id="cb9-13"><a href="#cb9-13"></a>             <span class="at">y =</span> <span class="st">`</span><span class="at">Warm Spell Start DOY</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>) <span class="sc">+</span></span>
+<span id="cb9-16"><a href="#cb9-16"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name =</span> <span class="st">"Warm Spell Start</span><span class="sc">\n</span><span class="st">Day of Year"</span>,</span>
+<span id="cb9-17"><a href="#cb9-17"></a>                     <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">150</span>)) <span class="sc">+</span></span>
+<span id="cb9-18"><a href="#cb9-18"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">1950</span>, <span class="cn">NA</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="environmental-climate-data-r_files/figure-revealjs/unnamed-chunk-10-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="calling-apis-for-data-you-cant-get-elsewhere" class="slide level2">
+<h2>Calling APIs (for data you can’t get elsewhere)</h2>
+<p>Sometimes, there isn’t a good R package for accessing some type of data, but there is an Application Programming Interface (API) that enables querying and retrieving the data. An example is the National Water Information System (NWIS, but see the <a href="https://rconnect.usgs.gov/dataRetrieval/"><code>dataRetrieval</code></a> package).</p>
+<p>Here, we’ll explore the NWIS API, whose documentation are available here:</p>
+<p><a href="https://waterservices.usgs.gov/rest/Site-Service.html" class="uri">https://waterservices.usgs.gov/rest/Site-Service.html</a></p>
+<p>Our goal is to map all the active stream gauges in Washoe County.</p>
+</section>
+<section id="calling-apis-for-data-you-cant-get-elsewhere-1" class="slide level2">
+<h2>Calling APIs (for data you can’t get elsewhere)</h2>
+<p>We’ll use the <code>httr2</code> package, which is a very modern library for making HTTP requests in R. <code>httr2</code> is <em>very</em> powerful, and we’ll only skim the surface of it here.</p>
+<p>In <code>httr2</code>, you start by creating a request:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>req <span class="ot">&lt;-</span> httr2<span class="sc">::</span><span class="fu">request</span>(<span class="st">"https://waterservices.usgs.gov/nwis/site/"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3"></a>httr2<span class="sc">::</span><span class="fu">req_dry_run</span>(req)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#&gt; GET /nwis/site/ HTTP/1.1
+#&gt; Host: waterservices.usgs.gov
+#&gt; User-Agent: httr2/0.2.2 r-curl/5.0.0 libcurl/7.86.0
+#&gt; Accept: */*
+#&gt; Accept-Encoding: deflate, gzip</code></pre>
+</div>
+</div>
+<p>Every request starts with a URL, which in this case points to the NWIS API server. The <code>httr2::req_dry_run()</code> function provides some information about what type of request it would perform if you told it to.</p>
+</section>
+<section id="calling-apis-for-data-you-cant-get-elsewhere-2" class="slide level2">
+<h2>Calling APIs (for data you can’t get elsewhere)</h2>
+<p>We modify URLs by adding <em>queries</em> using the <code>httr2::req_url_query()</code> function. A query consists of a set of parameters to the URL that control what the response is. In this case, looking at the <a href="https://waterservices.usgs.gov/rest/Site-Service.html">NWIS API documentation</a>, we can see that we are able to specify parameters for county, site type, and site status. We can add those parameters to the request.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>req <span class="ot">&lt;-</span> </span>
+<span id="cb12-2"><a href="#cb12-2"></a>  httr2<span class="sc">::</span><span class="fu">request</span>(<span class="st">"https://waterservices.usgs.gov/nwis/site/"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a>  httr2<span class="sc">::</span><span class="fu">req_url_query</span>(<span class="at">countyCd =</span> <span class="st">"32031"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4"></a>                       <span class="at">siteType=</span><span class="st">"ST"</span>,</span>
+<span id="cb12-5"><a href="#cb12-5"></a>                       <span class="at">siteStatus =</span> <span class="st">"active"</span>)</span>
+<span id="cb12-6"><a href="#cb12-6"></a></span>
+<span id="cb12-7"><a href="#cb12-7"></a>req</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Try copying a pasting the request into your browser. What happens?</p>
+<p><a href="https://waterservices.usgs.gov/nwis/site/?countyCd=32031&amp;siteType=ST&amp;siteStatus=active" class="uri">https://waterservices.usgs.gov/nwis/site/?countyCd=32031&amp;siteType=ST&amp;siteStatus=active</a></p>
+</section>
+<section id="calling-apis-for-data-you-cant-get-elsewhere-3" class="slide level2">
+<h2>Calling APIs (for data you can’t get elsewhere)</h2>
+<p>We make the request by using the <code>httr2::req_perform()</code> function. We can then view the raw “body” of the response, and parse it using <code>readr::read_tsv()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Perform the request</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>washoe_stream_gauges <span class="ot">&lt;-</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a>  httr2<span class="sc">::</span><span class="fu">req_perform</span>(req) <span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>  <span class="co"># Get the raw body of the response</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>  httr2<span class="sc">::</span><span class="fu">resp_body_raw</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>  <span class="co"># Parse the response, which is a tsv</span></span>
+<span id="cb13-7"><a href="#cb13-7"></a>  readr<span class="sc">::</span><span class="fu">read_tsv</span>(<span class="at">comment =</span> <span class="st">"#"</span>)</span>
+<span id="cb13-8"><a href="#cb13-8"></a></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="co"># Drop the first row, which are the class of the data</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a>washoe_stream_gauges[<span class="sc">-</span><span class="dv">1</span>,] <span class="sc">%&gt;%</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a>    <span class="co"># Convert into a spatial object</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a>  sf<span class="sc">::</span><span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"dec_long_va"</span>, <span class="st">"dec_lat_va"</span>),</span>
+<span id="cb13-13"><a href="#cb13-13"></a>               <span class="at">crs =</span> <span class="st">"WGS84"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a>mapview<span class="sc">::</span><span class="fu">mapview</span>(<span class="at">label =</span> <span class="st">"station_nm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-e946c614d5801a2d8d9f" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-e946c614d5801a2d8d9f">{"x":{"options":{"minZoom":1,"maxZoom":52,"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"preferCanvas":false,"bounceAtZoomLimits":false,"maxBounds":[[[-90,-370]],[[90,370]]]},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron","CartoDB.Positron","CartoDB.Positron",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatter","CartoDB.DarkMatter","CartoDB.DarkMatter",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap","OpenStreetMap","OpenStreetMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldImagery","Esri.WorldImagery","Esri.WorldImagery",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenTopoMap","OpenTopoMap","OpenTopoMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"createMapPane","args":["point",440]},{"method":"addCircleMarkers","args":[[39.24046325,39.2401855,39.17213045,39.5243537,39.50713218,39.4951111,39.53018865,39.5258333,39.51761667,39.56879988,39.5315833,39.20227778,39.27406389,39.29082778,39.3034222,39.31238889,39.28268875,39.3298333,39.35435414,39.3490833,39.3771333,39.38435455,39.42413889,39.4657449,39.5129672,39.5204672,39.55657878,39.63213447,39.7773722,39.85824197,39.2438111,39.277675],[-119.9465774,-119.9449106,-119.907963,-119.9954782,-119.931864,-119.8945,-119.7954684,-119.7766389,-119.7416444,-119.7265766,-119.7149722,-119.8710833,-119.8413528,-119.8309167,-119.8281667,-119.8232083,-119.7387937,-119.8019167,-119.8585225,-119.7900556,-119.7436583,-119.8401893,-119.7547778,-119.7285199,-119.712409,-119.7010198,-119.5532362,-119.2832254,-119.3375222,-119.4765687,-119.9406417,-119.9412833],6,null,".",{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"pane":"point","stroke":true,"color":"#333333","weight":1,"opacity":0.9,"fill":true,"fillColor":"#6666FF","fillOpacity":0.6},null,null,["<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>1&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.033670e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>THIRD CK NR CRYSTAL BAY, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>6234.03&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 1.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050101&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>2&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.033670e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>INCLINE CK NR CRYSTAL BAY, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>6246.90&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 1.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050101&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>3&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.033672e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>MARLETTE CK NR CARSON CITY, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>U&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>7760.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 0.01&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050101&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>4&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034731e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>DOG CK AT VERDI, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4900.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>20.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>5&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034746e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>TRUCKEE RV NR MOGUL, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4691.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 4.30&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>6&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034760e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>HUNTER CK NR RENO, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4880.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>20.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>7&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034800e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>TRUCKEE RV AT RENO, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4448.04&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 0.05&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>8&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034804e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>TRUCKEE RV AT GLENDALE AVE NR SPARKS, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>1&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4433.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 4.30&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>9&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034820e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>TRUCKEE RV NR SPARKS, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4386.03&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 0.07&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>10&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034824e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>N TRUCKEE DRAIN AT SPANISH SPRINGS RD NR SPARK, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4410.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>20.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>11&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034830e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>N TRUCKEE DRAIN NR BIG FISH DR NR SPARKS, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4394.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 4.30&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>12&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034846e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>FRANKTOWN CK NR CARSON CITY, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>1&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>7470.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>10.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>13&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034850e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>FRANKTOWN CK AT OLD US 395 NR FRANKTOWN, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>1&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>5077.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>20.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>14&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034852e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>OPHIR CK NR STEAMBOAT, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>5116.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>10.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>15&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034855e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>DAVIS CK AT DAVIS CK CMPGRD RD NR WASHOE CITY, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>5100.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>20.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>16&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034857e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>WINTERS CK BLW US ALT 395 NR WASHOE CITY, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>5095.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>10.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>17&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034860e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>JUMBO WASH NR NEW WASHOE CITY, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>5420.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>10.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>18&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034880e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>STEAMBOAT CK AT WASHOE LK DAM AT NEW WASHOE CITY&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>5043.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>20.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>19&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034885e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>GALENA CK AT GALENA CK STATE PARK, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>U&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>6320.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 0.01&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>20&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034900e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>GALENA CK BLW GALENA CK BRDG AT PLEASANT VLY, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>1&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4913.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>10.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>21&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034930e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>STEAMBOAT CK AT STEAMBOAT, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4600.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 0.01&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>22&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034970e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>WHITES CK NR STEAMBOAT, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>U&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>5955.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>40.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>23&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034977e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>WHITES CK AT OLD VIRGINIA RD NR RENO, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4512.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 1.60&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>24&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034985e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>STEAMBOAT CK AT SHORT LN AT RENO, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4415.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 5.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>25&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.034998e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>STEAMBOAT CK AT CLEANWATER WAY NR RENO, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4375.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 5.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>26&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.035000e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>TRUCKEE RV AT VISTA, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>U&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4371.16&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 0.10&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>27&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.035034e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>TRUCKEE RV NR TRACY, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4254.84&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 0.05&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050102&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>28&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.035165e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>TRUCKEE RV AT WADSWORTH, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>4039.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>10.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050103&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>29&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.035170e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>TRUCKEE RV NR NIXON, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>3940.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>20.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050103&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>30&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>1.035185e+07&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>PYRAMID LK TRIB NR NIXON, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>S&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>3940.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td>20.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NGVD29&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050103&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>31&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>3.914381e+14&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>INCLINE CK ABV DEER CK AT INCLINE VILLAGE, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>H&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>6294.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 5.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050101&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>32&emsp;<\/td><\/tr><tr><td>1<\/td><th>agency_cd&emsp;<\/th><td>USGS&emsp;<\/td><\/tr><tr><td>2<\/td><th>site_no&emsp;<\/th><td>3.916401e+14&emsp;<\/td><\/tr><tr><td>3<\/td><th>station_nm&emsp;<\/th><td>DEER CREEK AT SATURN COURT AT INCLINE VILLAGE, NV&emsp;<\/td><\/tr><tr><td>4<\/td><th>site_tp_cd&emsp;<\/th><td>ST&emsp;<\/td><\/tr><tr><td>5<\/td><th>coord_acy_cd&emsp;<\/th><td>H&emsp;<\/td><\/tr><tr><td>6<\/td><th>dec_coord_datum_cd&emsp;<\/th><td>NAD83&emsp;<\/td><\/tr><tr><td>7<\/td><th>alt_va&emsp;<\/th><td>7425.00&emsp;<\/td><\/tr><tr><td>8<\/td><th>alt_acy_va&emsp;<\/th><td> 5.00&emsp;<\/td><\/tr><tr><td>9<\/td><th>alt_datum_cd&emsp;<\/th><td>NAVD88&emsp;<\/td><\/tr><tr><td>10<\/td><th>huc_cd&emsp;<\/th><td>16050101&emsp;<\/td><\/tr><tr><td>11<\/td><th>geometry&emsp;<\/th><td>sfc_POINT&emsp;<\/td><\/tr><\/table><\/div>"],{"maxWidth":800,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"closeOnClick":true,"className":""},["THIRD CK NR CRYSTAL BAY, NV","INCLINE CK NR CRYSTAL BAY, NV","MARLETTE CK NR CARSON CITY, NV","DOG CK AT VERDI, NV","TRUCKEE RV NR MOGUL, NV","HUNTER CK NR RENO, NV","TRUCKEE RV AT RENO, NV","TRUCKEE RV AT GLENDALE AVE NR SPARKS, NV","TRUCKEE RV NR SPARKS, NV","N TRUCKEE DRAIN AT SPANISH SPRINGS RD NR SPARK, NV","N TRUCKEE DRAIN NR BIG FISH DR NR SPARKS, NV","FRANKTOWN CK NR CARSON CITY, NV","FRANKTOWN CK AT OLD US 395 NR FRANKTOWN, NV","OPHIR CK NR STEAMBOAT, NV","DAVIS CK AT DAVIS CK CMPGRD RD NR WASHOE CITY, NV","WINTERS CK BLW US ALT 395 NR WASHOE CITY, NV","JUMBO WASH NR NEW WASHOE CITY, NV","STEAMBOAT CK AT WASHOE LK DAM AT NEW WASHOE CITY","GALENA CK AT GALENA CK STATE PARK, NV","GALENA CK BLW GALENA CK BRDG AT PLEASANT VLY, NV","STEAMBOAT CK AT STEAMBOAT, NV","WHITES CK NR STEAMBOAT, NV","WHITES CK AT OLD VIRGINIA RD NR RENO, NV","STEAMBOAT CK AT SHORT LN AT RENO, NV","STEAMBOAT CK AT CLEANWATER WAY NR RENO, NV","TRUCKEE RV AT VISTA, NV","TRUCKEE RV NR TRACY, NV","TRUCKEE RV AT WADSWORTH, NV","TRUCKEE RV NR NIXON, NV","PYRAMID LK TRIB NR NIXON, NV","INCLINE CK ABV DEER CK AT INCLINE VILLAGE, NV","DEER CREEK AT SATURN COURT AT INCLINE VILLAGE, NV"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]},{"method":"addHomeButton","args":[-119.9954782,39.17213045,-119.2832254,39.85824197,true,".","Zoom to .","<strong> . <\/strong>","bottomright"]},{"method":"addLayersControl","args":[["CartoDB.Positron","CartoDB.DarkMatter","OpenStreetMap","Esri.WorldImagery","OpenTopoMap"],".",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"addLegend","args":[{"colors":["#6666FF"],"labels":["."],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"","extra":null,"layerId":null,"className":"info legend","group":"."}]}],"limits":{"lat":[39.17213045,39.85824197],"lng":[-119.9954782,-119.2832254]},"fitBounds":[39.17213045,-119.9954782,39.85824197,-119.2832254,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n      function(el, x, data) {\n      // get the leaflet map\n      var map = this; //HTMLWidgets.find('#' + el.id);\n      // we need a new div element because we have to handle\n      // the mouseover output separately\n      // debugger;\n      function addElement () {\n      // generate new div Element\n      var newDiv = $(document.createElement('div'));\n      // append at end of leaflet htmlwidget container\n      $(el).append(newDiv);\n      //provide ID and style\n      newDiv.addClass('lnlt');\n      newDiv.css({\n      'position': 'relative',\n      'bottomleft':  '0px',\n      'background-color': 'rgba(255, 255, 255, 0.7)',\n      'box-shadow': '0 0 2px #bbb',\n      'background-clip': 'padding-box',\n      'margin': '0',\n      'padding-left': '5px',\n      'color': '#333',\n      'font': '9px/1.5 \"Helvetica Neue\", Arial, Helvetica, sans-serif',\n      'z-index': '700',\n      });\n      return newDiv;\n      }\n\n\n      // check for already existing lnlt class to not duplicate\n      var lnlt = $(el).find('.lnlt');\n\n      if(!lnlt.length) {\n      lnlt = addElement();\n\n      // grab the special div we generated in the beginning\n      // and put the mousmove output there\n\n      map.on('mousemove', function (e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                           ' lon: ' + (e.latlng.lng).toFixed(5) +\n                           ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                           ' | zoom: ' + map.getZoom() +\n                           ' | x: ' + L.CRS.EPSG3857.project(e.latlng).x.toFixed(0) +\n                           ' | y: ' + L.CRS.EPSG3857.project(e.latlng).y.toFixed(0) +\n                           ' | epsg: 3857 ' +\n                           ' | proj4: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs ');\n      } else {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      }\n      });\n\n      // remove the lnlt div when mouse leaves map\n      map.on('mouseout', function (e) {\n      var strip = document.querySelector('.lnlt');\n      if( strip !==null) strip.remove();\n      });\n\n      };\n\n      //$(el).keypress(67, function(e) {\n      map.on('preclick', function(e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      var txt = document.querySelector('.lnlt').textContent;\n      console.log(txt);\n      //txt.innerText.focus();\n      //txt.select();\n      setClipboardText('\"' + txt + '\"');\n      }\n      });\n\n      }\n      ).call(this.getMap(), el, x, data);\n}","data":null},{"code":"function(el, x, data) {\n  return (function(el,x,data){\n           var map = this;\n\n           map.on('keypress', function(e) {\n               console.log(e.originalEvent.code);\n               var key = e.originalEvent.code;\n               if (key === 'KeyE') {\n                   var bb = this.getBounds();\n                   var txt = JSON.stringify(bb);\n                   console.log(txt);\n\n                   setClipboardText('\\'' + txt + '\\'');\n               }\n           })\n        }).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+</div>
+</div>
+</section>
+<section id="cogs-gridded-data-from-the-cloud" class="slide level2">
+<h2>COGS: Gridded data from the Cloud</h2>
+<p><strong>PRO TIP</strong>: We aren’t going to have time to go through this, but data that are in Cloud-Optimized GeoTiff (COG) format and are stored in the “cloud” (Amazon S3 buckets, for instance) can be loaded into <code>terra</code> directly, and cropped <em>prior to retrieval from the host server</em>. This is a really powerful way to get at cloud-hosted geospatial data.</p>
+<p>For example, median June temperature from the NASA NEX-GDDP downscaled CMIP6 climate projections, cropped to Nevada:</p>
+<div class="cell panel-fill columns column-output-location" data-layout-align="center">
+<div class="column">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>terra<span class="sc">::</span><span class="fu">rast</span>(</span>
+<span id="cb14-2"><a href="#cb14-2"></a>  <span class="st">"https://nex-gddp-cmip6-cog.s3-us-west-2.amazonaws.com/monthly/CMIP6_ensemble_median/tas/tas_month_ensemble-median_ssp585_209906.tif"</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>  <span class="co"># Crop and mask to Nevada</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>  terra<span class="sc">::</span><span class="fu">crop</span>(AOI<span class="sc">::</span><span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"Nevada"</span>),</span>
+<span id="cb14-6"><a href="#cb14-6"></a>              <span class="at">mask =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a>  <span class="co"># Convert from K to ºF</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a>  {</span>
+<span id="cb14-9"><a href="#cb14-9"></a>    (. <span class="sc">-</span> <span class="fl">273.15</span>) <span class="sc">*</span> <span class="dv">9</span><span class="sc">/</span><span class="dv">5</span> <span class="sc">+</span> <span class="dv">32</span></span>
+<span id="cb14-10"><a href="#cb14-10"></a>  } <span class="sc">%&gt;%</span></span>
+<span id="cb14-11"><a href="#cb14-11"></a>  <span class="fu">plot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="environmental-climate-data-r_files/figure-revealjs/unnamed-chunk-14-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div class="footer footer-default">
+
+</div>
+</section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="environmental-climate-data-r_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="environmental-climate-data-r_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="environmental-climate-data-r_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="environmental-climate-data-r_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="environmental-climate-data-r_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="environmental-climate-data-r_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="environmental-climate-data-r_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="environmental-climate-data-r_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="environmental-climate-data-r_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="environmental-climate-data-r_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'smaller': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': true,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        target: function(trigger) {
+          return trigger.previousElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      });
+      function tippyHover(el, contentFn) {
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto-reveal',
+          placement: 'bottom-start'
+        };
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          return note.innerHTML;
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
